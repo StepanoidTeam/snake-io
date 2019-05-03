@@ -6,8 +6,7 @@ var svgns = "http://www.w3.org/2000/svg"; //НО ОБИДНО!!! не могу �
 var rectSize = 20; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
 var matrixSize = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
 var speedMs = 90; // чем больше число тем медленее скорость змеи
-var messageBlock = document.querySelector(".message");
-
+var scoreMessageBlock = document.querySelector(".high-scores");
 const gameOverScreen = document.querySelector(".game-over");
 
 gameOverScreen.setAttribute("hidden", true);
@@ -29,7 +28,7 @@ var currentX = 6; // изначальное положение змеи по x (
 var currentY = 5; // изначальное положение змеи по y (вертикально)
 var nextMoveX = 1; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
 var nextMoveY = 0; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
-var snakeL = 2; // длина змеи
+var snakeLength = 2; // длина змеи
 
 var move = 0; //Увеличивала значение,ничего не изменилось
 
@@ -47,7 +46,7 @@ function drawPoint(x, y) {
   rectObj.setAttributeNS(null, "class", "snake");
   rectArray.push(rect);
   svg.appendChild(rectObj);
-  if (rectArray.length > snakeL) {
+  if (rectArray.length > snakeLength) {
     svg.removeChild(rectArray[0][0]); //Oh my God
     rectArray.shift();
   }
@@ -76,50 +75,42 @@ function gameOverMessage(name = "user", score = "0") {
   gameOverScreen.removeAttribute("hidden");
 }
 
-function scoreMessage(scoreObj) {
-  let message = "Name: " + scoreObj.name + " Score: " + scoreObj.score;
-  var scoreMess = (document.createElement("span").innerHTML = message);
-  messageBlock.appendChild = scoreMess;
+function updateScoreMessage(scores) {
+  const listItems = scores.map(s => `<li>${s.name} - ${s.score}</li>`).join("");
+
+  scoreMessageBlock.innerHTML = listItems;
 }
 
-async function sendScore(score) {
+async function sendScore(score = 0) {
   const rawResponse = await fetch("/setScore", {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ name: "bob", score: score })
+    body: JSON.stringify({ name: "bob", score })
   });
 
-  const content = await rawResponse.json();
-
-  console.log(content);
+  const scores = await rawResponse.json();
+  return scores;
 }
 
-function getScore() {
-  return (async () => {
-    const rawResponse = await fetch("/getScore", {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      }
-    });
+async function getScore() {
+  const rawResponse = await fetch("/getScore", {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    }
+  });
 
-    const content = rawResponse.json();
-    await scoreMessage(content);
-  })();
+  const scores = await rawResponse.json();
+  return scores;
 }
 
 function controllingSnake() {
   var nextX = currentX + nextMoveX;
   var nextY = currentY + nextMoveY;
-
-  function deathMsg() {
-    clearInterval(timing);
-    console.log("GAME OVER!\nYour result is " + snakeL + "!");
-  }
 
   if (
     nextY < 0 ||
@@ -130,25 +121,21 @@ function controllingSnake() {
     svg.setAttributeNS(null, "style", "border: 20px outset #696969;");
 
     clearInterval(timing);
-    sendScore(snakeL);
-    gameOverMessage("bob", snakeL);
-
-    deathMsg();
+    sendScore(snakeLength).then(updateScoreMessage);
+    gameOverMessage("bob", snakeLength);
 
     return;
   }
   if ((currentX == apple[1]) & (currentY == apple[2])) {
-    snakeL++;
+    snakeLength++;
     svg.removeChild(apple[0]);
     setApple();
   }
   rectArray.forEach(function(element) {
     if (nextX == element[1] && nextY == element[2]) {
       clearInterval(timing);
-      sendScore(snakeL);
-      gameOverMessage("bob", snakeL);
-
-      deathMsg();
+      sendScore(snakeLength).then(updateScoreMessage);
+      gameOverMessage("bob", snakeLength);
 
       return;
     }
@@ -189,7 +176,8 @@ function is_touch_device() {
   );
 }
 function startup() {
-  getScore();
+  getScore().then(updateScoreMessage);
+
   if (is_touch_device()) {
     document.body.addEventListener("touchstart", handleStart, false);
     document.body.addEventListener("touchend", handleEnd, false);

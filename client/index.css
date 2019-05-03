@@ -25,7 +25,17 @@ canvas#game {
   background-color: #9ec79e;
 }
 
-.game-over {
+.splash-screen {
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-over {
   font-size: 4em;
+}
+
+.high-scores {
 }
