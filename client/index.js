@@ -77,20 +77,18 @@ function scoreMessage(scoreObj) {
   messageBlock.appendChild = scoreMess;
 }
 
-function sendScore(score) {
-  (async () => {
-    const rawResponse = await fetch("/setScore", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name: "bob", score: score })
-    });
-    const content = await rawResponse.json();
+async function sendScore(score) {
+  const rawResponse = await fetch("/setScore", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ name: "bob", score: score })
+  });
+  const content = await rawResponse.json();
 
-    console.log(content);
-  })();
+  console.log(content);
 }
 
 function getScore() {
@@ -102,9 +100,8 @@ function getScore() {
         "Content-Type": "application/json"
       }
     });
-    console.log(rawResponse);
 
-    const content = await JSON.parse(rawResponse);
+    const content = rawResponse.json();
     await scoreMessage(content);
   })();
 }
