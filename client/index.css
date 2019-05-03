@@ -1,0 +1,31 @@
+@import url("https://fonts.googleapis.com/css?family=Fredoka+One");
+@import url("https://fonts.googleapis.com/css?family=Baloo+Paaji");
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  font-family: "Fredoka One", cursive;
+  --font-family: "Baloo Paaji", cursive;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+canvas#game {
+  display: none;
+  height: 600px;
+  width: 800px;
+  background-color: #9ec79e;
+}
+
+.game-over {
+  position: absolute;
+  font-size: 4em;
+}

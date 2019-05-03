@@ -8,6 +8,10 @@ var matrixSize = 30; // чем больше число тем больше ма�
 var speedMs = 90; // чем больше число тем медленее скорость змеи
 var messageBlock = document.querySelector(".message");
 
+const gameOverScreen = document.querySelector(".game-over");
+
+gameOverScreen.setAttribute("hidden", true);
+
 // тут наверное вызывается функция и ей передаются параметры. Пыталась добавить еще параметр,но игнорит
 svg.setAttributeNS(
   null,
@@ -68,7 +72,8 @@ var timing = setInterval(function() {
 
 function gameOverMessage(name = "user", score = "0") {
   let message = "Name: " + name + " Score: " + score;
-  messageBlock.innerHTML = "GAME OVER!!";
+
+  gameOverScreen.removeAttribute("hidden");
 }
 
 function scoreMessage(scoreObj) {
@@ -86,6 +91,7 @@ async function sendScore(score) {
     },
     body: JSON.stringify({ name: "bob", score: score })
   });
+
   const content = await rawResponse.json();
 
   console.log(content);
