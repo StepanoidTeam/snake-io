@@ -1,0 +1,22 @@
+{
+  "name": "snake-io",
+  "version": "1.0.0",
+  "description": "snake io attempt for nik to learn server side js and so on",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StepanoidTeam/snake-io.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StepanoidTeam/snake-io/issues"
+  },
+  "homepage": "https://github.com/StepanoidTeam/snake-io#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
