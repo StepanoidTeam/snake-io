@@ -6,6 +6,7 @@ var svgns = "http://www.w3.org/2000/svg"; //НО ОБИДНО!!! не могу �
 var rectSize = 20; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
 var matrixSize = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
 var speedMs = 90; // чем больше число тем медленее скорость змеи
+var messageBlock = document.querySelector(".message");
 
 // тут наверное вызывается функция и ей передаются параметры. Пыталась добавить еще параметр,но игнорит
 svg.setAttributeNS(
@@ -65,6 +66,49 @@ var timing = setInterval(function() {
   controllingSnake();
 }, speedMs);
 
+function gameOverMessage(name = "user", score = "0") {
+  let message = "Name: " + name + " Score: " + score;
+  messageBlock.innerHTML = "GAME OVER!!";
+}
+
+function scoreMessage(scoreObj) {
+  let message = "Name: " + scoreObj.name + " Score: " + scoreObj.score;
+  var scoreMess = (document.createElement("span").innerHTML = message);
+  messageBlock.appendChild = scoreMess;
+}
+
+function sendScore(score) {
+  (async () => {
+    const rawResponse = await fetch("/setScore", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name: "bob", score: score })
+    });
+    const content = await rawResponse.json();
+
+    console.log(content);
+  })();
+}
+
+function getScore() {
+  return (async () => {
+    const rawResponse = await fetch("/getScore", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    });
+    console.log(rawResponse);
+
+    const content = await JSON.parse(rawResponse);
+    await scoreMessage(content);
+  })();
+}
+
 function controllingSnake() {
   var nextX = currentX + nextMoveX;
   var nextY = currentY + nextMoveY;
@@ -76,7 +120,9 @@ function controllingSnake() {
   ) {
     svg.setAttributeNS(null, "style", "border: 20px outset #696969;");
     clearInterval(timing);
-    alert("GAME OVER!\nYour result is " + snakeL + "!");
+    sendScore(snakeL);
+    gameOverMessage("bob", snakeL);
+
     return;
   }
   if ((currentX == apple[1]) & (currentY == apple[2])) {
@@ -87,7 +133,8 @@ function controllingSnake() {
   rectArray.forEach(function(element) {
     if (nextX == element[1] && nextY == element[2]) {
       clearInterval(timing);
-      alert("GAME OVER!\nYour result is " + snakeL + "!");
+      sendScore(snakeL);
+      gameOverMessage("bob", snakeL);
       return;
     }
   });
@@ -126,6 +173,7 @@ function is_touch_device() {
   );
 }
 function startup() {
+  getScore();
   if (is_touch_device()) {
     document.body.addEventListener("touchstart", handleStart, false);
     document.body.addEventListener("touchend", handleEnd, false);
