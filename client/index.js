@@ -112,6 +112,12 @@ function getScore() {
 function controllingSnake() {
   var nextX = currentX + nextMoveX;
   var nextY = currentY + nextMoveY;
+
+  function deathMsg() {
+    clearInterval(timing);
+    console.log("GAME OVER!\nYour result is " + snakeL + "!");
+  }
+
   if (
     nextY < 0 ||
     nextY > matrixSize - 1 ||
@@ -119,9 +125,12 @@ function controllingSnake() {
     nextX > matrixSize - 1
   ) {
     svg.setAttributeNS(null, "style", "border: 20px outset #696969;");
+
     clearInterval(timing);
     sendScore(snakeL);
     gameOverMessage("bob", snakeL);
+
+    deathMsg();
 
     return;
   }
@@ -135,9 +144,13 @@ function controllingSnake() {
       clearInterval(timing);
       sendScore(snakeL);
       gameOverMessage("bob", snakeL);
+
+      deathMsg();
+
       return;
     }
   });
+
   drawPoint(nextX, nextY);
   currentX = nextX;
   currentY = nextY;
@@ -218,3 +231,5 @@ function handleEnd(evt2) {
     nextMoveY = 0;
   }
 }
+
+startup();
