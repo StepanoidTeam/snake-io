@@ -10,7 +10,7 @@
   </head>
 
   <body>
-    <div class="message"></div>
+    <div class="debug"></div>
 
   <body>
       <div class="splash-screen">
@@ -24,9 +24,14 @@
 
       </div>
       
-    <canvas id="game">
+    <canvas id="">
       no canvas support
     </canvas>
+
+    <script>
+        const debug = document.querySelector('.debug');
+        debug.textContent = window.clientInformation.maxTouchPoints;
+    </script>
 
 
     <script type="module" src="./index.mjs"></script>
