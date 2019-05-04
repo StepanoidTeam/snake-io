@@ -1,43 +1,48 @@
 import {} from "./ws-client.mjs";
 import { setupControls } from "./controls/index.mjs";
 import { getScore, sendScore } from "./hi-scores.mjs";
-import { Cell, Apple, SnakePart } from "./components/index.mjs";
+import { Cell, Apple, SnakePart, Point } from "./components/index.js";
 
-let fieldSizeCells = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
-let speedMs = 90; // чем больше число тем медленее скорость змеи
-let scoreMessageBlock = document.querySelector(".high-scores");
-const splashScreen = document.querySelector(".splash-screen");
-
-let svg = document.createElementNS(
-  "http://www.w3.org/2000/svg",
-  "svg"
-); /*то что это маштабируемая векторная графика уже поняла....хотела сделать градиент змею*/
-
+const fieldSizeCells = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
+const speedMs = 90; // чем больше число тем медленее скорость змеи
 // тут наверное вызывается функция и ей передаются параметры. Пыталась добавить еще параметр,но игнорит
 const boardSize = Cell.sizePx * fieldSizeCells;
 
-svg.setAttributeNS(
-  null,
-  "width",
-  boardSize
-); /* Тут ответ.Размер змеи умножается на рамер матрицы,поэтому происходит расширение матрицы при 
-увеличении змеи */
+const scoreMessageBlock = document.querySelector(".high-scores");
+const splashScreen = document.querySelector(".splash-screen");
 
-svg.setAttributeNS(null, "height", boardSize); // тоже самое, только увеличивается высота
+function initBoard() {
+  const svg = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg"
+  ); /*то что это маштабируемая векторная графика уже поняла....хотела сделать градиент змею*/
 
-document.body.appendChild(svg); // функция вызывает другую функцию
+  svg.setAttributeNS(
+    null,
+    "width",
+    boardSize
+  ); /* Тут ответ.Размер змеи умножается на рамер матрицы,поэтому происходит расширение матрицы при 
+  увеличении змеи */
+
+  svg.setAttributeNS(null, "height", boardSize); // тоже самое, только увеличивается высота
+
+  document.body.appendChild(svg); // функция вызывает другую функцию
+
+  return svg;
+}
+
+//todo: move to game phase
+const svg = initBoard();
 
 //Змея движется в пределах 600x на 600y
-const snakeHead = {
-  x: 6,
-  y: 5
-};
+const snakeHead = new Point(5, 5);
+
 let snakeLength = 2; // длина змеи
 
 let snakeParts = []; // пустой массив
 
 // пошел страшный код
-function drawPoint(x, y) {
+function moveSnakeTo({ x, y }) {
   const snakePart = new SnakePart(x, y);
 
   snakeParts.push(snakePart);
@@ -63,6 +68,7 @@ function putNewApple() {
 }
 
 putNewApple();
+
 let timing = setInterval(function() {
   controllingSnake();
 }, speedMs);
@@ -101,7 +107,7 @@ function controllingSnake() {
   }
 
   [...apples.values()]
-    .filter(apple => apple.collidesWith(snakeHead))
+    .filter(apple => snakeHead.collidesWith(apple))
     .forEach(a => {
       snakeLength++;
       svg.removeChild(a.rect);
@@ -120,7 +126,7 @@ function controllingSnake() {
     }
   });
 
-  drawPoint(nextPos.x, nextPos.y);
+  moveSnakeTo(nextPos);
   snakeHead.x = nextPos.x;
   snakeHead.y = nextPos.y;
 }
