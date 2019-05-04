@@ -26,10 +26,26 @@ canvas {
 #game {
   /* height: 100vmin; */
   /* width: 100vmin; */
-  background-color: #9ec79e;
+  /* background-color: #9ec79e; */
+}
 
+svg {
   border: 20px inset #c71585;
   background-color: #ffdcf2;
+  transition: all 300ms ease;
+}
+
+svg.dead {
+  background-color: #919191;
+  border: 20px outset #696969;
+}
+/* svg */
+.snake {
+  fill: black;
+}
+
+.apple {
+  fill: red;
 }
 
 .splash-screen {

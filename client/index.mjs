@@ -2,11 +2,6 @@ import {} from "./ws-client.mjs";
 import { setupControls } from "./controls/index.mjs";
 import { getScore, sendScore } from "./hi-scores.mjs";
 
-let svg = document.createElementNS(
-  "http://www.w3.org/2000/svg",
-  "svg"
-); /*то что это маштабируемая векторная графика уже поняла....хотела сделать градиент змею*/
-let svgns = "http://www.w3.org/2000/svg"; //НО ОБИДНО!!! не могу поменять змею и точку! научи....
 let cellSizePx = 20; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
 let fieldSizeCells = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
 let speedMs = 90; // чем больше число тем медленее скорость змеи
@@ -15,6 +10,11 @@ const gameOverScreen = document.querySelector(".game-over");
 
 gameOverScreen.setAttribute("hidden", true);
 
+let svg = document.createElementNS(
+  "http://www.w3.org/2000/svg",
+  "svg"
+); /*то что это маштабируемая векторная графика уже поняла....хотела сделать градиент змею*/
+
 // тут наверное вызывается функция и ей передаются параметры. Пыталась добавить еще параметр,но игнорит
 svg.setAttributeNS(
   null,
@@ -22,7 +22,7 @@ svg.setAttributeNS(
   cellSizePx * fieldSizeCells
 ); /* Тут ответ.Размер змеи умножается на рамер матрицы,поэтому происходит расширение матрицы при 
 увеличении змеи */
-svg.id = "game";
+
 svg.setAttributeNS(null, "height", cellSizePx * fieldSizeCells); // тоже самое, только увеличивается высота
 
 document.body.appendChild(svg); // функция вызывает другую функцию
@@ -51,6 +51,7 @@ function drawPoint(x, y) {
 
 const apples = new Set();
 
+let svgns = "http://www.w3.org/2000/svg"; //НО ОБИДНО!!! не могу поменять змею и точку! научи....
 class Cell {
   constructor(x, y) {
     this.x = x;
@@ -72,8 +73,7 @@ class SnakePart extends Cell {
   constructor(x, y) {
     super(x, y);
     // svg
-    this.rect.setAttributeNS(null, "fill", "black");
-    this.rect.setAttributeNS(null, "class", "snake");
+    this.rect.classList.add("snake");
   }
 }
 
@@ -81,7 +81,7 @@ class Apple extends Cell {
   constructor(x, y) {
     super(x, y);
     // svg
-    this.rect.setAttributeNS(null, "fill", "#f00");
+    this.rect.classList.add("apple");
   }
 
   static gen() {
@@ -92,21 +92,19 @@ class Apple extends Cell {
   }
 }
 
-function putNewAple() {
+function putNewApple() {
   const apple = Apple.gen();
   svg.appendChild(apple.rect);
 
   apples.add(apple);
 }
 
-putNewAple();
+putNewApple();
 let timing = setInterval(function() {
   controllingSnake();
 }, speedMs);
 
 function gameOverMessage(name = "user", score = "0") {
-  let message = "Name: " + name + " Score: " + score;
-
   gameOverScreen.removeAttribute("hidden");
 }
 
@@ -131,7 +129,7 @@ function controllingSnake() {
     nextPos.x < 0 ||
     nextPos.x > fieldSizeCells - 1
   ) {
-    svg.setAttributeNS(null, "style", "border: 20px outset #696969;");
+    svg.classList.add("dead");
 
     clearInterval(timing);
     sendScore(snakeLength).then(updateScoreMessage);
@@ -146,8 +144,8 @@ function controllingSnake() {
       snakeLength++;
       svg.removeChild(a.rect);
       apples.delete(a);
-      putNewAple();
-      putNewAple(); //spawn apples!
+      putNewApple();
+      putNewApple(); //spawn apples!
     });
 
   snakeParts.forEach(function(snakePart) {
