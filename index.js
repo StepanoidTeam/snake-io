@@ -26,7 +26,10 @@ app.post("/setScore", function(req, res) {
   //do not push random shit
   let user = req.body;
 
-  users.push(user);
+  users.splice(10);
+  users.unshift(user);
+
+  broadcast(JSON.stringify(user));
 
   res.json(users);
 });
@@ -44,16 +47,23 @@ const WebSocket = require("ws");
 
 const wss = new WebSocket.Server({ port: wsPort });
 console.log(`websocket listening on port ${wsPort}`);
-// Broadcast to all.
+
+function broadcast(msg) {
+  if (wss && wss.clients)
+    [...wss.clients]
+      .filter(client => client.readyState === WebSocket.OPEN)
+      .forEach(client => {
+        client.send(msg);
+      });
+}
+
 wss.on("connection", function connection(ws) {
   console.log("connected");
+  broadcast("@b:" + "connected someone else");
   ws.on("message", function incoming(message) {
     console.log("received: %s", message);
     ws.send("yes it is111");
-
-    setTimeout(function timeout() {
-      ws.send(Date.now());
-    }, 500);
+    broadcast("@b:" + message);
   });
 
   ws.send("something");
