@@ -1,12 +1,12 @@
-var svg = document.createElementNS(
+let svg = document.createElementNS(
   "http://www.w3.org/2000/svg",
   "svg"
 ); /*то что это маштабируемая векторная графика уже поняла....хотела сделать градиент змею*/
-var svgns = "http://www.w3.org/2000/svg"; //НО ОБИДНО!!! не могу поменять змею и точку! научи....
-var rectSize = 20; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
-var matrixSize = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
-var speedMs = 90; // чем больше число тем медленее скорость змеи
-var scoreMessageBlock = document.querySelector(".high-scores");
+let svgns = "http://www.w3.org/2000/svg"; //НО ОБИДНО!!! не могу поменять змею и точку! научи....
+let rectSize = 20; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
+let matrixSize = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
+let speedMs = 90; // чем больше число тем медленее скорость змеи
+let scoreMessageBlock = document.querySelector(".high-scores");
 const gameOverScreen = document.querySelector(".game-over");
 
 gameOverScreen.setAttribute("hidden", true);
@@ -20,24 +20,28 @@ svg.setAttributeNS(
 увеличении змеи */
 
 svg.setAttributeNS(null, "height", rectSize * matrixSize); // тоже самое, только увеличивается высота
-svg.setAttributeNS(null, "style", "border: 20px inset #C71585;"); //размер,вид,цвет бордюра
+svg.setAttributeNS(
+  null,
+  "style",
+  "border: 20px inset #C71585; background-color: #ffdcf2;"
+); //размер,вид,цвет бордюра
 document.body.appendChild(svg); // функция вызывает другую функцию
 
 //Змея движется в пределах 600x на 600y
-var currentX = 6; // изначальное положение змеи по x (горизонтально)
-var currentY = 5; // изначальное положение змеи по y (вертикально)
-var nextMoveX = 1; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
-var nextMoveY = 0; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
-var snakeLength = 2; // длина змеи
+let currentX = 6; // изначальное положение змеи по x (горизонтально)
+let currentY = 5; // изначальное положение змеи по y (вертикально)
+let nextMoveX = 1; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
+let nextMoveY = 0; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
+let snakeLength = 2; // длина змеи
 
-var move = 0; //Увеличивала значение,ничего не изменилось
+let move = 0; //Увеличивала значение,ничего не изменилось
 
-var rectArray = []; // пустой массив
+let rectArray = []; // пустой массив
 
 // пошел страшный код
 function drawPoint(x, y) {
-  var rect = [document.createElementNS(svgns, "rect"), x, y];
-  var rectObj = rect[0];
+  let rect = [document.createElementNS(svgns, "rect"), x, y];
+  let rectObj = rect[0];
   rectObj.setAttributeNS(null, "x", x * rectSize); //вроде как вызов функции с заданными параметрами
   rectObj.setAttributeNS(null, "y", y * rectSize); // не пойму зачем null.
   rectObj.setAttributeNS(null, "height", rectSize); // у нас в тесте вроде было похожее.
@@ -52,9 +56,10 @@ function drawPoint(x, y) {
   }
 }
 
+let apple = null;
 function setApple() {
-  appleX = Math.floor(Math.random() * matrixSize);
-  appleY = Math.floor(Math.random() * matrixSize);
+  let appleX = Math.floor(Math.random() * matrixSize);
+  let appleY = Math.floor(Math.random() * matrixSize);
   apple = [document.createElementNS(svgns, "rect"), appleX, appleY];
   apple[0].setAttributeNS(null, "x", appleX * rectSize);
   apple[0].setAttributeNS(null, "y", appleY * rectSize);
@@ -65,7 +70,7 @@ function setApple() {
 }
 
 setApple();
-var timing = setInterval(function() {
+let timing = setInterval(function() {
   controllingSnake();
 }, speedMs);
 
@@ -109,8 +114,8 @@ async function getScore() {
 }
 
 function controllingSnake() {
-  var nextX = currentX + nextMoveX;
-  var nextY = currentY + nextMoveY;
+  let nextX = currentX + nextMoveX;
+  let nextY = currentY + nextMoveY;
 
   if (
     nextY < 0 ||
