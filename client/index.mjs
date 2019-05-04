@@ -1,14 +1,14 @@
-import {} from "./wsClient.mjs";
-
+import {} from "./ws-client.mjs";
 import { setupControls } from "./controls/index.mjs";
+import { getScore, sendScore } from "./hi-scores.mjs";
 
 let svg = document.createElementNS(
   "http://www.w3.org/2000/svg",
   "svg"
 ); /*то что это маштабируемая векторная графика уже поняла....хотела сделать градиент змею*/
 let svgns = "http://www.w3.org/2000/svg"; //НО ОБИДНО!!! не могу поменять змею и точку! научи....
-let rectSize = 20; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
-let matrixSize = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
+let cellSizePx = 20; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
+let fieldSizeCells = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
 let speedMs = 90; // чем больше число тем медленее скорость змеи
 let scoreMessageBlock = document.querySelector(".high-scores");
 const gameOverScreen = document.querySelector(".game-over");
@@ -19,11 +19,11 @@ gameOverScreen.setAttribute("hidden", true);
 svg.setAttributeNS(
   null,
   "width",
-  rectSize * matrixSize
+  cellSizePx * fieldSizeCells
 ); /* Тут ответ.Размер змеи умножается на рамер матрицы,поэтому происходит расширение матрицы при 
 увеличении змеи */
 svg.id = "game";
-svg.setAttributeNS(null, "height", rectSize * matrixSize); // тоже самое, только увеличивается высота
+svg.setAttributeNS(null, "height", cellSizePx * fieldSizeCells); // тоже самое, только увеличивается высота
 
 document.body.appendChild(svg); // функция вызывает другую функцию
 
@@ -32,42 +32,60 @@ let currentX = 6; // изначальное положение змеи по x (
 let currentY = 5; // изначальное положение змеи по y (вертикально)
 let snakeLength = 2; // длина змеи
 
-let move = 0; //Увеличивала значение,ничего не изменилось
-
-let rectArray = []; // пустой массив
+let snakeParts = []; // пустой массив
 
 // пошел страшный код
 function drawPoint(x, y) {
   let rect = [document.createElementNS(svgns, "rect"), x, y];
   let rectObj = rect[0];
-  rectObj.setAttributeNS(null, "x", x * rectSize); //вроде как вызов функции с заданными параметрами
-  rectObj.setAttributeNS(null, "y", y * rectSize); // не пойму зачем null.
-  rectObj.setAttributeNS(null, "height", rectSize); // у нас в тесте вроде было похожее.
-  rectObj.setAttributeNS(null, "width", rectSize); // Снчала стоял 0,но не прокатило.Поменяли на null
+  rectObj.setAttributeNS(null, "x", x * cellSizePx); //вроде как вызов функции с заданными параметрами
+  rectObj.setAttributeNS(null, "y", y * cellSizePx); // не пойму зачем null.
+  rectObj.setAttributeNS(null, "height", cellSizePx); // у нас в тесте вроде было похожее.
+  rectObj.setAttributeNS(null, "width", cellSizePx); // Снчала стоял 0,но не прокатило.Поменяли на null
   rectObj.setAttributeNS(null, "fill", "#000"); // Но не поняла почему
   rectObj.setAttributeNS(null, "class", "snake");
-  rectArray.push(rect);
+  snakeParts.push(rect);
   svg.appendChild(rectObj);
-  if (rectArray.length > snakeLength) {
-    svg.removeChild(rectArray[0][0]); //Oh my God
-    rectArray.shift();
+  if (snakeParts.length > snakeLength) {
+    svg.removeChild(snakeParts[0][0]); //Oh my God
+    snakeParts.shift();
   }
 }
 
-let apple = null;
-function setApple() {
-  let appleX = Math.floor(Math.random() * matrixSize);
-  let appleY = Math.floor(Math.random() * matrixSize);
-  apple = [document.createElementNS(svgns, "rect"), appleX, appleY];
-  apple[0].setAttributeNS(null, "x", appleX * rectSize);
-  apple[0].setAttributeNS(null, "y", appleY * rectSize);
-  apple[0].setAttributeNS(null, "height", rectSize);
-  apple[0].setAttributeNS(null, "width", rectSize);
-  apple[0].setAttributeNS(null, "fill", "#f00");
-  svg.appendChild(apple[0]);
+const apples = new Set();
+
+class Apple {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+
+    // svg part
+    const rect = document.createElementNS(svgns, "rect");
+    rect.setAttributeNS(null, "x", x * cellSizePx);
+    rect.setAttributeNS(null, "y", y * cellSizePx);
+    rect.setAttributeNS(null, "height", cellSizePx);
+    rect.setAttributeNS(null, "width", cellSizePx);
+    rect.setAttributeNS(null, "fill", "#f00");
+
+    this.rect = rect;
+  }
+
+  static gen() {
+    let x = Math.floor(Math.random() * fieldSizeCells);
+    let y = Math.floor(Math.random() * fieldSizeCells);
+
+    return new Apple(x, y);
+  }
 }
 
-setApple();
+function putNewAple() {
+  const apple = Apple.gen();
+  svg.appendChild(apple.rect);
+
+  apples.add(apple);
+}
+
+putNewAple();
 let timing = setInterval(function() {
   controllingSnake();
 }, speedMs);
@@ -84,33 +102,6 @@ function updateScoreMessage(scores) {
   scoreMessageBlock.innerHTML = listItems;
 }
 
-async function sendScore(score = 0) {
-  const rawResponse = await fetch("/setScore", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ name: "bob", score })
-  });
-
-  const scores = await rawResponse.json();
-  return scores;
-}
-
-async function getScore() {
-  const rawResponse = await fetch("/getScore", {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json"
-    }
-  });
-
-  const scores = await rawResponse.json();
-  return scores;
-}
-
 let getInput = setupControls();
 
 function controllingSnake() {
@@ -120,9 +111,9 @@ function controllingSnake() {
 
   if (
     nextY < 0 ||
-    nextY > matrixSize - 1 ||
+    nextY > fieldSizeCells - 1 ||
     nextX < 0 ||
-    nextX > matrixSize - 1
+    nextX > fieldSizeCells - 1
   ) {
     svg.setAttributeNS(null, "style", "border: 20px outset #696969;");
 
@@ -132,12 +123,18 @@ function controllingSnake() {
 
     return;
   }
-  if ((currentX == apple[1]) & (currentY == apple[2])) {
-    snakeLength++;
-    svg.removeChild(apple[0]);
-    setApple();
-  }
-  rectArray.forEach(function(element) {
+
+  [...apples.values()]
+    .filter(a => a.x === currentX && a.y === currentY)
+    .forEach(a => {
+      snakeLength++;
+      svg.removeChild(a.rect);
+      apples.delete(a);
+      putNewAple();
+      putNewAple(); //spawn apples!
+    });
+
+  snakeParts.forEach(function(element) {
     if (nextX == element[1] && nextY == element[2]) {
       clearInterval(timing);
       sendScore(snakeLength).then(updateScoreMessage);
