@@ -6,9 +6,7 @@ let cellSizePx = 20; //чем больше число тем больше раз
 let fieldSizeCells = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
 let speedMs = 90; // чем больше число тем медленее скорость змеи
 let scoreMessageBlock = document.querySelector(".high-scores");
-const gameOverScreen = document.querySelector(".game-over");
-
-gameOverScreen.setAttribute("hidden", true);
+const splashScreen = document.querySelector(".splash-screen");
 
 let svg = document.createElementNS(
   "http://www.w3.org/2000/svg",
@@ -104,8 +102,9 @@ let timing = setInterval(function() {
   controllingSnake();
 }, speedMs);
 
-function gameOverMessage(name = "user", score = "0") {
-  gameOverScreen.removeAttribute("hidden");
+function showSplashScreen(name = "user", score = 0) {
+  svg.classList.add("dead");
+  splashScreen.classList.add("visible");
 }
 
 function updateScoreMessage(scores) {
@@ -129,11 +128,9 @@ function controllingSnake() {
     nextPos.x < 0 ||
     nextPos.x > fieldSizeCells - 1
   ) {
-    svg.classList.add("dead");
-
     clearInterval(timing);
     sendScore(snakeLength).then(updateScoreMessage);
-    gameOverMessage("bob", snakeLength);
+    showSplashScreen("bob", snakeLength);
 
     return;
   }
@@ -152,7 +149,7 @@ function controllingSnake() {
     if (snakePart.collidesWith(nextPos)) {
       clearInterval(timing);
       sendScore(snakeLength).then(updateScoreMessage);
-      gameOverMessage("bob", snakeLength);
+      showSplashScreen("bob", snakeLength);
 
       return;
     }

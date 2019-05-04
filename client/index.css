@@ -54,6 +54,12 @@ svg.dead {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  visibility: hidden;
+}
+
+.splash-screen.visible {
+  visibility: visible;
 }
 
 .game-over {
