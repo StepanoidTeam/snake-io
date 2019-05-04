@@ -1,5 +1,7 @@
 import {} from "./wsClient.mjs";
 
+import { setupControls } from "./controls/index.mjs";
+
 let svg = document.createElementNS(
   "http://www.w3.org/2000/svg",
   "svg"
@@ -20,20 +22,14 @@ svg.setAttributeNS(
   rectSize * matrixSize
 ); /* Тут ответ.Размер змеи умножается на рамер матрицы,поэтому происходит расширение матрицы при 
 увеличении змеи */
-
+svg.id = "game";
 svg.setAttributeNS(null, "height", rectSize * matrixSize); // тоже самое, только увеличивается высота
-svg.setAttributeNS(
-  null,
-  "style",
-  "border: 20px inset #C71585; background-color: #ffdcf2;"
-); //размер,вид,цвет бордюра
+
 document.body.appendChild(svg); // функция вызывает другую функцию
 
 //Змея движется в пределах 600x на 600y
 let currentX = 6; // изначальное положение змеи по x (горизонтально)
 let currentY = 5; // изначальное положение змеи по y (вертикально)
-let nextMoveX = 1; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
-let nextMoveY = 0; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
 let snakeLength = 2; // длина змеи
 
 let move = 0; //Увеличивала значение,ничего не изменилось
@@ -115,9 +111,12 @@ async function getScore() {
   return scores;
 }
 
+let getInput = setupControls();
+
 function controllingSnake() {
-  let nextX = currentX + nextMoveX;
-  let nextY = currentY + nextMoveY;
+  let input = getInput();
+  let nextX = currentX + input.x;
+  let nextY = currentY + input.y;
 
   if (
     nextY < 0 ||
@@ -153,84 +152,10 @@ function controllingSnake() {
   currentY = nextY;
 }
 
-document.onkeydown = checkKey;
-function checkKey(e) {
-  e = e || window.event;
-  if (e.keyCode == "38") {
-    //up arrow
-    nextMoveX = 0;
-    nextMoveY = -1;
-  } else if (e.keyCode == "40") {
-    //down arrow
-    nextMoveX = 0;
-    nextMoveY = 1;
-  } else if (e.keyCode == "37") {
-    //left arrow
-    nextMoveX = -1;
-    nextMoveY = 0;
-  } else if (e.keyCode == "39") {
-    //right arrow
-    nextMoveX = 1;
-    nextMoveY = 0;
-  }
-}
-
-function is_touch_device() {
-  return (
-    "ontouchstart" in window ||
-    navigator.MaxTouchPoints > 0 ||
-    navigator.msMaxTouchPoints > 0
-  );
-}
 function startup() {
   getScore().then(updateScoreMessage);
 
-  if (is_touch_device()) {
-    document.body.addEventListener("touchstart", handleStart, false);
-    document.body.addEventListener("touchend", handleEnd, false);
-  } else {
-    console.log("Is not touch device");
-  }
-}
-let tStartX;
-let tStartY;
-function handleStart(event) {
-  event.preventDefault();
-  tStartX = event.touches[0].screenX;
-  tStartY = event.touches[0].screenY;
-}
-function handleEnd(event) {
-  event.preventDefault();
-  let tEndX = event.changedTouches[0].screenX;
-  let tEndY = event.changedTouches[0].screenY;
-
-  let totalX = tStartX - tEndX;
-  let totalY = tStartY - tEndY;
-
-  let move;
-  if (Math.abs(totalX) > Math.abs(totalY)) {
-    totalX >= 0 ? (move = 4) : (move = 2);
-  } else {
-    totalY >= 0 ? (move = 1) : (move = 3);
-  }
-
-  if (move == 1) {
-    //slide up
-    nextMoveX = 0;
-    nextMoveY = -1;
-  } else if (move == 3) {
-    //slide down
-    nextMoveX = 0;
-    nextMoveY = 1;
-  } else if (move == 4) {
-    //slide left
-    nextMoveX = -1;
-    nextMoveY = 0;
-  } else if (move == 2) {
-    //slide right
-    nextMoveX = 1;
-    nextMoveY = 0;
-  }
+  //todo: init controls
 }
 
 startup();
