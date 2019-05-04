@@ -1,3 +1,5 @@
+import {} from "./wsClient.mjs";
+
 let svg = document.createElementNS(
   "http://www.w3.org/2000/svg",
   "svg"
@@ -190,19 +192,22 @@ function startup() {
     console.log("Is not touch device");
   }
 }
-function handleStart(evt) {
-  evt.preventDefault();
-  tStartX = evt.touches[0].screenX;
-  tStartY = evt.touches[0].screenY;
+let tStartX;
+let tStartY;
+function handleStart(event) {
+  event.preventDefault();
+  tStartX = event.touches[0].screenX;
+  tStartY = event.touches[0].screenY;
 }
-function handleEnd(evt2) {
-  evt2.preventDefault();
-  tEndX = evt2.changedTouches[0].screenX;
-  tEndY = evt2.changedTouches[0].screenY;
+function handleEnd(event) {
+  event.preventDefault();
+  let tEndX = event.changedTouches[0].screenX;
+  let tEndY = event.changedTouches[0].screenY;
 
-  totalX = tStartX - tEndX;
-  totalY = tStartY - tEndY;
+  let totalX = tStartX - tEndX;
+  let totalY = tStartY - tEndY;
 
+  let move;
   if (Math.abs(totalX) > Math.abs(totalY)) {
     totalX >= 0 ? (move = 4) : (move = 2);
   } else {
