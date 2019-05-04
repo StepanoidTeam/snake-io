@@ -1,5 +1,5 @@
-import { initKeyboard } from "./keyboard.mjs";
-import { initTouch } from "./touch.mjs";
+import { initKeyboard } from "./keyboard.js";
+import { initTouch } from "./touch.js";
 
 const IS_TOUCH_DEVICE = navigator.MaxTouchPoints > 0;
 

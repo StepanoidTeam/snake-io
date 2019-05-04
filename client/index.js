@@ -1,6 +1,6 @@
-import {} from "./ws-client.mjs";
-import { setupControls } from "./controls/index.mjs";
-import { getScore, sendScore } from "./hi-scores.mjs";
+import {} from "./ws-client.js";
+import { setupControls } from "./controls/index.js";
+import { getScore, sendScore } from "./hi-scores.js";
 import { Cell, Apple, SnakePart, Point } from "./components/index.js";
 
 const fieldSizeCells = 30; // чем больше число тем больше матрица, то есть размер поля для змеи
