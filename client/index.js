@@ -42,21 +42,17 @@ function initNewGame(doneFn, svg, getInput) {
   //Змея движется в пределах 600x на 600y
   const snakeHead = new Point({ x: 5, y: 5 });
 
-  let snakeLength = 2; // длина змеи
-
-  let snakeParts = []; // пустой массив
+  const snakeParts = [new SnakePart(snakeHead)]; // пустой массив
 
   // пошел страшный код
-  function moveSnakeTo({ x, y }) {
+  function moveSnakeTo({ x, y }, expand) {
     const snakePart = new SnakePart({ x, y });
 
     snakeParts.push(snakePart);
 
     svg.appendChild(snakePart.rect);
 
-    if (snakeParts.length > snakeLength) {
-      svg.removeChild(snakeParts.shift().rect); //Oh my God
-    }
+    if (!expand) svg.removeChild(snakeParts.shift().rect); //Oh my God
   }
 
   const apples = new Set();
@@ -82,41 +78,45 @@ function initNewGame(doneFn, svg, getInput) {
     let input = getInput();
     const nextPos = Point.add(snakeHead, input);
 
+    if (snakeParts.length === 0) {
+      clearInterval(timing);
+      doneFn(snakeParts.length);
+      return;
+    }
+
+    //smashed the wall
     if (
       nextPos.y < 0 ||
       nextPos.y > fieldSizeCells - 1 ||
       nextPos.x < 0 ||
       nextPos.x > fieldSizeCells - 1
     ) {
-      //smashed the wall
-      clearInterval(timing);
-      doneFn(snakeLength);
-
+      svg.removeChild(snakeParts.shift().rect);
       return;
     }
 
     //eats itself
-    [...snakeParts].forEach(snakePart => {
+    [...snakeParts].forEach((snakePart, partIndex) => {
       if (snakePart.collidesWith(nextPos)) {
-        clearInterval(timing);
-        doneFn(snakeLength);
+        const deadTail = snakeParts.splice(0, partIndex);
 
-        return;
+        deadTail.forEach(part => svg.removeChild(part.rect)); //Oh my God
       }
     });
 
+    let snakeExpands = false;
     //eat apples
     [...apples.values()]
       .filter(apple => snakeHead.collidesWith(apple))
-      .forEach(a => {
-        snakeLength++;
-        svg.removeChild(a.rect);
-        apples.delete(a);
+      .forEach(apple => {
+        svg.removeChild(apple.rect);
+        apples.delete(apple);
+        snakeExpands = true;
         putNewApple();
         putNewApple(); //spawn apples!
       });
 
-    moveSnakeTo(nextPos);
+    moveSnakeTo(nextPos, snakeExpands);
     snakeHead.x = nextPos.x;
     snakeHead.y = nextPos.y;
   }
