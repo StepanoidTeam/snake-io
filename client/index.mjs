@@ -28,46 +28,60 @@ svg.setAttributeNS(null, "height", cellSizePx * fieldSizeCells); // тоже с�
 document.body.appendChild(svg); // функция вызывает другую функцию
 
 //Змея движется в пределах 600x на 600y
-let currentX = 6; // изначальное положение змеи по x (горизонтально)
-let currentY = 5; // изначальное положение змеи по y (вертикально)
+const snakeHead = {
+  x: 6,
+  y: 5
+};
 let snakeLength = 2; // длина змеи
 
 let snakeParts = []; // пустой массив
 
 // пошел страшный код
 function drawPoint(x, y) {
-  let rect = [document.createElementNS(svgns, "rect"), x, y];
-  let rectObj = rect[0];
-  rectObj.setAttributeNS(null, "x", x * cellSizePx); //вроде как вызов функции с заданными параметрами
-  rectObj.setAttributeNS(null, "y", y * cellSizePx); // не пойму зачем null.
-  rectObj.setAttributeNS(null, "height", cellSizePx); // у нас в тесте вроде было похожее.
-  rectObj.setAttributeNS(null, "width", cellSizePx); // Снчала стоял 0,но не прокатило.Поменяли на null
-  rectObj.setAttributeNS(null, "fill", "#000"); // Но не поняла почему
-  rectObj.setAttributeNS(null, "class", "snake");
-  snakeParts.push(rect);
-  svg.appendChild(rectObj);
+  const snakePart = new SnakePart(x, y);
+
+  snakeParts.push(snakePart);
+
+  svg.appendChild(snakePart.rect);
+
   if (snakeParts.length > snakeLength) {
-    svg.removeChild(snakeParts[0][0]); //Oh my God
-    snakeParts.shift();
+    svg.removeChild(snakeParts.shift().rect); //Oh my God
   }
 }
 
 const apples = new Set();
 
-class Apple {
+class Cell {
   constructor(x, y) {
     this.x = x;
     this.y = y;
+    //svg
+    this.rect = document.createElementNS(svgns, "rect");
+    this.rect.setAttributeNS(null, "x", x * cellSizePx);
+    this.rect.setAttributeNS(null, "y", y * cellSizePx);
+    this.rect.setAttributeNS(null, "height", cellSizePx);
+    this.rect.setAttributeNS(null, "width", cellSizePx);
+  }
 
-    // svg part
-    const rect = document.createElementNS(svgns, "rect");
-    rect.setAttributeNS(null, "x", x * cellSizePx);
-    rect.setAttributeNS(null, "y", y * cellSizePx);
-    rect.setAttributeNS(null, "height", cellSizePx);
-    rect.setAttributeNS(null, "width", cellSizePx);
-    rect.setAttributeNS(null, "fill", "#f00");
+  collidesWith({ x, y }) {
+    return this.x === x && this.y === y;
+  }
+}
 
-    this.rect = rect;
+class SnakePart extends Cell {
+  constructor(x, y) {
+    super(x, y);
+    // svg
+    this.rect.setAttributeNS(null, "fill", "black");
+    this.rect.setAttributeNS(null, "class", "snake");
+  }
+}
+
+class Apple extends Cell {
+  constructor(x, y) {
+    super(x, y);
+    // svg
+    this.rect.setAttributeNS(null, "fill", "#f00");
   }
 
   static gen() {
@@ -106,14 +120,16 @@ let getInput = setupControls();
 
 function controllingSnake() {
   let input = getInput();
-  let nextX = currentX + input.x;
-  let nextY = currentY + input.y;
+  const nextPos = {
+    x: snakeHead.x + input.x,
+    y: snakeHead.y + input.y
+  };
 
   if (
-    nextY < 0 ||
-    nextY > fieldSizeCells - 1 ||
-    nextX < 0 ||
-    nextX > fieldSizeCells - 1
+    nextPos.y < 0 ||
+    nextPos.y > fieldSizeCells - 1 ||
+    nextPos.x < 0 ||
+    nextPos.x > fieldSizeCells - 1
   ) {
     svg.setAttributeNS(null, "style", "border: 20px outset #696969;");
 
@@ -125,7 +141,7 @@ function controllingSnake() {
   }
 
   [...apples.values()]
-    .filter(a => a.x === currentX && a.y === currentY)
+    .filter(apple => apple.collidesWith(snakeHead))
     .forEach(a => {
       snakeLength++;
       svg.removeChild(a.rect);
@@ -134,8 +150,8 @@ function controllingSnake() {
       putNewAple(); //spawn apples!
     });
 
-  snakeParts.forEach(function(element) {
-    if (nextX == element[1] && nextY == element[2]) {
+  snakeParts.forEach(function(snakePart) {
+    if (snakePart.collidesWith(nextPos)) {
       clearInterval(timing);
       sendScore(snakeLength).then(updateScoreMessage);
       gameOverMessage("bob", snakeLength);
@@ -144,9 +160,9 @@ function controllingSnake() {
     }
   });
 
-  drawPoint(nextX, nextY);
-  currentX = nextX;
-  currentY = nextY;
+  drawPoint(nextPos.x, nextPos.y);
+  snakeHead.x = nextPos.x;
+  snakeHead.y = nextPos.y;
 }
 
 function startup() {
