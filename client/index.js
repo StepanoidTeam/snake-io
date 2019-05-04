@@ -35,7 +35,7 @@ function initBoard() {
 const svg = initBoard();
 
 //Змея движется в пределах 600x на 600y
-const snakeHead = new Point(5, 5);
+const snakeHead = new Point({ x: 5, y: 5 });
 
 let snakeLength = 2; // длина змеи
 
@@ -43,7 +43,7 @@ let snakeParts = []; // пустой массив
 
 // пошел страшный код
 function moveSnakeTo({ x, y }) {
-  const snakePart = new SnakePart(x, y);
+  const snakePart = new SnakePart({ x, y });
 
   snakeParts.push(snakePart);
 
@@ -60,7 +60,7 @@ function putNewApple() {
   let x = Math.floor(Math.random() * fieldSizeCells);
   let y = Math.floor(Math.random() * fieldSizeCells);
 
-  const apple = new Apple(x, y);
+  const apple = new Apple({ x, y });
 
   svg.appendChild(apple.rect);
 
@@ -88,10 +88,7 @@ let getInput = setupControls();
 
 function controllingSnake() {
   let input = getInput();
-  const nextPos = {
-    x: snakeHead.x + input.x,
-    y: snakeHead.y + input.y
-  };
+  const nextPos = Point.add(snakeHead, input);
 
   if (
     nextPos.y < 0 ||
@@ -99,6 +96,7 @@ function controllingSnake() {
     nextPos.x < 0 ||
     nextPos.x > fieldSizeCells - 1
   ) {
+    //smashed the wall
     clearInterval(timing);
     sendScore(snakeLength).then(updateScoreMessage);
     showSplashScreen("bob", snakeLength);
@@ -106,6 +104,18 @@ function controllingSnake() {
     return;
   }
 
+  //eats itself
+  [...snakeParts].forEach(snakePart => {
+    if (snakePart.collidesWith(nextPos)) {
+      clearInterval(timing);
+      sendScore(snakeLength).then(updateScoreMessage);
+      showSplashScreen("bob", snakeLength);
+
+      return;
+    }
+  });
+
+  //eat apples
   [...apples.values()]
     .filter(apple => snakeHead.collidesWith(apple))
     .forEach(a => {
@@ -116,28 +126,13 @@ function controllingSnake() {
       putNewApple(); //spawn apples!
     });
 
-  snakeParts.forEach(function(snakePart) {
-    if (snakePart.collidesWith(nextPos)) {
-      clearInterval(timing);
-      sendScore(snakeLength).then(updateScoreMessage);
-      showSplashScreen("bob", snakeLength);
-
-      return;
-    }
-  });
-
   moveSnakeTo(nextPos);
   snakeHead.x = nextPos.x;
   snakeHead.y = nextPos.y;
 }
 
-function startup() {
-  getScore().then(updateScoreMessage);
-}
-
-startup();
-
 (function gameLoop() {
+  getScore().then(updateScoreMessage);
   //init all
   //wait for start
   //play/dead
