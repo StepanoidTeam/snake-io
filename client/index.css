@@ -48,6 +48,8 @@ canvas {
   background-color: #ffffffaa;
   padding: 10px;
   border-radius: 10px;
+
+  border: 2px solid #15c733;
 }
 
 .hidden {

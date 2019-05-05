@@ -4,12 +4,22 @@ import { getMainColor } from "../helpers/get-main-color.js";
 
 export const IMAGES = {
   DEBUG: "debug.png",
+  //bonuses
   APPLE_RED: "red-apple_1f34e.png",
+  APPLE_GREEN: "green-apple_1f34f.png",
+  WATERMELON: "watermelon_1f349.png",
+  BANANA: "banana_1f34c.png",
+  EGGPLANT: "aubergine_1f346.png",
+
+  //snake parts
   SNAKE_JOINT: "new-moon-symbol_1f311.png",
   SNAKE_BODY: "full-moon-symbol_1f315.png",
   // SNAKE_HEAD: "pig-face_1f437.png",
   //SNAKE_HEAD: "smiling-face-with-horns_1f608.png",
-  SNAKE_HEAD: "frog-face_1f438.png"
+  SNAKE_HEAD: "frog-face_1f438.png",
+  SNAKE_HEAD_FROG: "frog-face_1f438.png",
+  SNAKE_HEAD_DEMON: "smiling-face-with-horns_1f608.png",
+  SNAKE_HEAD_PIG: "pig-face_1f437.png"
 };
 
 export const IMAGE_LIB = (async () => {
