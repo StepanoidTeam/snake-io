@@ -34,22 +34,9 @@ body {
 }
 
 canvas {
-  border: 20px inset #c71585;
-  background-color: #ffdcf2;
+  border: 20px inset #15c733;
+  background-color: #dcffe1;
   transition: all 300ms ease;
-}
-
-svg.dead {
-  background-color: #919191;
-  border: 20px outset #696969;
-}
-/* svg */
-.snake {
-  fill: black;
-}
-
-.apple {
-  fill: red;
 }
 
 .splash-screen {
@@ -58,6 +45,9 @@ svg.dead {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: #ffffffaa;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .hidden {
@@ -66,6 +56,12 @@ svg.dead {
 
 .game-over {
   font-size: 4em;
+}
+
+.btn-start-game {
+  font-size: 2em;
+  border-color: black;
+  background-color: lightgray;
 }
 
 .debug {
