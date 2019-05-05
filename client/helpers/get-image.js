@@ -13,5 +13,3 @@ export function getImage(name) {
     });
   });
 }
-
-getImage();
