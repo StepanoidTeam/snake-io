@@ -1,4 +1,4 @@
-/* @import url("https://fonts.googleapis.com/css?family=Fredoka+One"); */
+@import url("https://fonts.googleapis.com/css?family=Fredoka+One");
 /* @import url("https://fonts.googleapis.com/css?family=Baloo+Paaji"); */
 
 html,
@@ -26,17 +26,14 @@ body {
   align-items: center;
 }
 
-canvas {
-  display: none;
-}
-
 #game {
-  /* height: 100vmin; */
-  /* width: 100vmin; */
+  box-sizing: border-box;
+  height: 100vmin;
+  width: 100vmin;
   /* background-color: #9ec79e; */
 }
 
-svg {
+canvas {
   border: 20px inset #c71585;
   background-color: #ffdcf2;
   transition: all 300ms ease;

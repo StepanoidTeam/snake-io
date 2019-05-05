@@ -28,7 +28,7 @@ export class Point {
 }
 
 export class Cell extends Point {
-  static sizePx = 20; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
+  static sizePx = 144; //чем больше число тем больше размер змеи, но матрица почему-то тоже увеличивается
 
   constructor({ x, y }) {
     super({ x, y });
