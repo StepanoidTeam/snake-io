@@ -5,9 +5,9 @@ import { getMainColor } from "../helpers/get-main-color.js";
 export const IMAGES = {
   DEBUG: "debug.png",
   APPLE_RED: "red-apple_1f34e.png",
-  SNAKE_BODY: "full-moon-symbol_1f315.png",
   SNAKE_JOINT: "new-moon-symbol_1f311.png",
-  SNAKE_HEAD: "pig-face_1f437.png",
+  SNAKE_BODY: "full-moon-symbol_1f315.png",
+  // SNAKE_HEAD: "pig-face_1f437.png",
   //SNAKE_HEAD: "smiling-face-with-horns_1f608.png",
   SNAKE_HEAD: "frog-face_1f438.png"
 };
