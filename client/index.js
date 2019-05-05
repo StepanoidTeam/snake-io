@@ -1,11 +1,7 @@
 import {} from "./ws-client.js";
 import { setupControls } from "./controls/index.js";
 import { getScore, sendScore } from "./hi-scores.js";
-import { Sprite, Apple, Point, Snake } from "./components/index.js";
-import { recolorImage } from "./helpers/recolor-image.js";
-import { getImage } from "./helpers/get-image.js";
-import { getMainColor } from "./helpers/get-main-color.js";
-import { IMAGES } from "./images/index.js";
+import { Apple, Point, Snake } from "./components/index.js";
 import { Container } from "./components/container.js";
 import { cellSizePx } from "./components/sprite.js";
 
@@ -45,24 +41,15 @@ function startGameSplash(doneFn, result) {
 
 const gameComponentContainer = new Set();
 
-function initNewGame(doneFn, getInput) {
+function initNewGame(deadFn, getInput) {
   gameComponentContainer.clear();
 
   const apples = new Container();
 
-  const snakeHead = new Point({ x: 5, y: 5 });
-  const snake = new Snake(snakeHead);
+  const snake = new Snake({ x: 5, y: 5 });
 
   gameComponentContainer.add(apples);
   gameComponentContainer.add(snake);
-
-  // пошел страшный код
-  //todo: move to snake
-  function moveSnakeTo({ x, y }, expand) {
-    snake.snakeParts.push(new Point({ x, y }));
-
-    if (!expand) snake.snakeParts.shift(); //Oh my God
-  }
 
   function putNewApple() {
     let x = Math.floor(Math.random() * fieldSizeCells);
@@ -73,21 +60,31 @@ function initNewGame(doneFn, getInput) {
 
   putNewApple();
 
-  let timing = setInterval(function() {
-    controllingSnake();
-  }, speedMs);
+  let stopUpdates = false;
+  let lastRender = 0;
+  (function update(timestamp) {
+    if (stopUpdates) return;
+
+    let progress = timestamp - lastRender;
+
+    if (progress > 100) {
+      controllingSnake();
+      lastRender = timestamp;
+    }
+    requestAnimationFrame(update);
+  })();
 
   function controllingSnake() {
     let input = getInput();
-    const nextPos = Point.add(snakeHead, input);
 
     if (snake.snakeParts.length === 0) {
-      clearInterval(timing);
+      stopUpdates = true;
       //todo: count apples, not snake len
-      doneFn(snake.snakeParts.length);
+      deadFn(snake.snakeParts.length);
       return;
     }
 
+    const nextPos = Point.add(snake.head(), input);
     //smashed the wall
     if (
       nextPos.y < 0 ||
@@ -107,20 +104,18 @@ function initNewGame(doneFn, getInput) {
       }
     });
 
-    let snakeExpands = false;
     //eat apples
     [...apples.values()]
-      .filter(apple => snakeHead.collidesWith(apple))
+      .filter(apple => snake.head().collidesWith(apple))
       .forEach(apple => {
         apples.delete(apple);
-        snakeExpands = true;
+        snake.grow(nextPos);
+
         putNewApple();
         putNewApple(); //spawn apples!
       });
 
-    moveSnakeTo(nextPos, snakeExpands);
-    snakeHead.x = nextPos.x;
-    snakeHead.y = nextPos.y;
+    snake.moveTo(nextPos);
   }
 }
 

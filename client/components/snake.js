@@ -1,10 +1,8 @@
 import { Point, Sprite } from "./index.js";
 import { Container } from "./container.js";
-import { cellSizePx } from "./sprite.js";
 import { IMAGES } from "../images/index.js";
 
 export class Snake extends Container {
-  snakeParts = [];
   constructor({ x, y }) {
     super();
     this.snakeParts = [new Point({ x, y })];
@@ -16,49 +14,47 @@ export class Snake extends Container {
     };
   }
 
+  head() {
+    const [head] = this.snakeParts.slice(-1);
+    return head;
+  }
+
+  grow({ x, y }) {
+    this.snakeParts.push(new Point({ x, y }));
+  }
+
+  shrink() {
+    this.snakeParts.shift();
+  }
+
+  moveTo({ x, y }) {
+    this.grow({ x, y });
+    this.shrink();
+  }
+
   draw(ctx) {
-    this.snakeParts.reduce((prev, cur, curIndex) => {
-      const isHead = curIndex === this.snakeParts.length - 1;
-
-      //joint
-      if (prev) {
-        this.sprites.snakeJoint.x = cur.x + (prev.x - cur.x) / 2;
-        this.sprites.snakeJoint.y = cur.y + (prev.y - cur.y) / 2;
+    if (this.snakeParts.length === 0) return;
+    //draw joints
+    if (this.snakeParts.length > 1) {
+      this.snakeParts.reduce((prev, part) => {
+        this.sprites.snakeJoint.x = part.x + (prev.x - part.x) / 2;
+        this.sprites.snakeJoint.y = part.y + (prev.y - part.y) / 2;
         this.sprites.snakeJoint.draw(ctx);
-      }
 
-      if (prev && isHead) {
-        let degrees = 0;
-        if (prev.y - cur.y === -1) {
-          degrees = 180;
-        } else if (prev.y - cur.y === 1) {
-          degrees = 0;
-        } else if (prev.x - cur.x === -1) {
-          degrees = 90;
-        } else if (prev.x - cur.x === 1) {
-          degrees = 270;
-        }
+        return part;
+      });
+    }
 
-        // drawRotated(
-        //   IMAGES.SNAKE_HEAD,
-        //   cur.x * cellSizePx,
-        //   cur.y * cellSizePx,
-        //   cellSizePx,
-        //   degrees
-        // );
+    //draw body
+    this.snakeParts.forEach(part => {
+      this.sprites.snakeBody.x = part.x;
+      this.sprites.snakeBody.y = part.y;
+      this.sprites.snakeBody.draw(ctx);
+    });
 
-        this.sprites.snakeHead.x = cur.x;
-        this.sprites.snakeHead.y = cur.y;
-        this.sprites.snakeHead.draw(ctx);
-      }
-      //bone
-      else {
-        this.sprites.snakeBody.x = cur.x;
-        this.sprites.snakeBody.y = cur.y;
-        this.sprites.snakeBody.draw(ctx);
-      }
+    //draw head
 
-      return cur;
-    }, null);
+    this.sprites.snakeHead.move(this.head());
+    this.sprites.snakeHead.draw(ctx);
   }
 }
