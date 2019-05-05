@@ -2,7 +2,6 @@ import {} from "./ws-client.js";
 import { setupControls } from "./controls/index.js";
 import { getScore, sendScore } from "./hi-scores.js";
 import { Cell, Apple, SnakePart, Point } from "./components/index.js";
-import { initBoard } from "./game-board.js";
 
 const fieldSizeCells = 20; // чем больше число тем больше матрица, то есть размер поля для змеи
 const speedMs = 120; // чем больше число тем медленее скорость змеи
@@ -152,6 +151,17 @@ function drawLoop(canvas) {
       );
     });
 
+    function drawRotated(image, x, y, size, degrees) {
+      const radius = size / 2;
+      ctx.translate(x + radius, y + radius);
+      ctx.rotate((degrees * Math.PI) / 180);
+      ctx.translate(-x - radius, -y - radius);
+      ctx.drawImage(image, x, y, size, size);
+      ctx.translate(x + radius, y + radius);
+      ctx.rotate((-degrees * Math.PI) / 180);
+      ctx.translate(-x - radius, -y - radius);
+    }
+
     snakeParts.reduce((prev, cur, curi) => {
       const isHead = curi === snakeParts.length - 1;
 
@@ -165,14 +175,45 @@ function drawLoop(canvas) {
           Cell.sizePx
         );
       }
+
+      if (prev && isHead) {
+        let degrees = 0;
+        if (prev.y - cur.y === -1) {
+          degrees = 180;
+        } else if (prev.y - cur.y === 1) {
+          degrees = 0;
+        } else if (prev.x - cur.x === -1) {
+          degrees = 90;
+        } else if (prev.x - cur.x === 1) {
+          degrees = 270;
+        }
+
+        // ctx.drawImage(
+        //   isHead ? IMAGES.DEBUG : IMAGES.SNAKE_BODY,
+        //   cur.x * Cell.sizePx,
+        //   cur.y * Cell.sizePx,
+        //   Cell.sizePx,
+        //   Cell.sizePx
+        // );
+        drawRotated(
+          IMAGES.SNAKE_HEAD,
+          cur.x * Cell.sizePx,
+          cur.y * Cell.sizePx,
+          Cell.sizePx,
+          degrees
+        );
+      }
       //bone
-      ctx.drawImage(
-        isHead ? IMAGES.SNAKE_HEAD : IMAGES.SNAKE_BODY,
-        cur.x * Cell.sizePx,
-        cur.y * Cell.sizePx,
-        Cell.sizePx,
-        Cell.sizePx
-      );
+      else {
+        ctx.drawImage(
+          isHead ? IMAGES.SNAKE_HEAD : IMAGES.SNAKE_BODY,
+          cur.x * Cell.sizePx,
+          cur.y * Cell.sizePx,
+          Cell.sizePx,
+          Cell.sizePx
+        );
+      }
+
       return cur;
     }, null);
 
