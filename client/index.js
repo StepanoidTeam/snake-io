@@ -2,6 +2,9 @@ import {} from "./ws-client.js";
 import { setupControls } from "./controls/index.js";
 import { getScore, sendScore } from "./hi-scores.js";
 import { Cell, Apple, SnakePart, Point } from "./components/index.js";
+import { recolorImage } from "./helpers/recolor-image.js";
+import { getImage } from "./helpers/get-image.js";
+import { getMainColor } from "./helpers/get-main-color.js";
 
 const fieldSizeCells = 20; // чем больше число тем больше матрица, то есть размер поля для змеи
 const speedMs = 120; // чем больше число тем медленее скорость змеи
@@ -120,22 +123,33 @@ function promisify(fn, ...args) {
   return new Promise(resolve => fn(resolve, ...args));
 }
 
-export function getImage(path) {
-  let imgElement = document.createElement("img");
-  imgElement.src = "images/" + path;
-  return imgElement;
-}
-
-const IMAGES = {
-  DEBUG: getImage("debug.png"),
-  APPLE_RED: getImage("red-apple_1f34e.png"),
-  SNAKE_BODY: getImage("new-moon-symbol_1f311.png"),
-  SNAKE_JOINT: getImage("medium-black-circle_26ab.png"),
-  SNAKE_HEAD: getImage("smiling-face-with-horns_1f608.png")
-};
-
-function drawLoop(canvas) {
+async function drawLoop(canvas) {
   const ctx = canvas.getContext("2d");
+
+  const IMAGES = {
+    DEBUG: await getImage("debug.png"),
+    APPLE_RED: await getImage("red-apple_1f34e.png"),
+    SNAKE_BODY: await getImage("full-moon-symbol_1f315.png"),
+    SNAKE_JOINT: await getImage("new-moon-symbol_1f311.png"),
+    SNAKE_HEAD: await getImage("pig-face_1f437.png"),
+    SNAKE_HEAD: await getImage("smiling-face-with-horns_1f608.png"),
+    SNAKE_HEAD: await getImage("frog-face_1f438.png")
+    //SNAKE_HEAD: recolorImage(await getImage("frog-face_1f438.png"), "#ff000050")
+  };
+
+  //console.log(); //
+
+  const recolorOpacity = (200).toString(16).padStart(2, "0");
+
+  IMAGES.SNAKE_BODY = recolorImage(
+    IMAGES.SNAKE_BODY,
+    getMainColor(IMAGES.SNAKE_HEAD) + recolorOpacity
+  );
+
+  IMAGES.SNAKE_JOINT = recolorImage(
+    IMAGES.SNAKE_JOINT,
+    getMainColor(IMAGES.SNAKE_HEAD) + recolorOpacity
+  );
 
   (function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
