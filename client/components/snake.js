@@ -32,8 +32,12 @@ export class Snake extends Container {
     this.shrink();
   }
 
+  isDead() {
+    return this.snakeParts.length === 0;
+  }
+
   draw(ctx) {
-    if (this.snakeParts.length === 0) return;
+    if (this.isDead()) return;
     //draw joints
     if (this.snakeParts.length > 1) {
       this.snakeParts.reduce((prev, part) => {

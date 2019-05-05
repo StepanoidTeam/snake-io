@@ -45,6 +45,7 @@ function initNewGame(deadFn, getInput) {
   gameComponentContainer.clear();
 
   const apples = new Container();
+  let applesCollected = 0;
 
   const snake = new Snake({ x: 5, y: 5 });
 
@@ -77,10 +78,10 @@ function initNewGame(deadFn, getInput) {
   function controllingSnake() {
     let input = getInput();
 
-    if (snake.snakeParts.length === 0) {
+    if (snake.isDead()) {
       stopUpdates = true;
       //todo: count apples, not snake len
-      deadFn(snake.snakeParts.length);
+      deadFn(applesCollected);
       return;
     }
 
@@ -109,10 +110,12 @@ function initNewGame(deadFn, getInput) {
       .filter(apple => snake.head().collidesWith(apple))
       .forEach(apple => {
         apples.delete(apple);
+        applesCollected++;
         snake.grow(nextPos);
 
+        //spawn apples!
         putNewApple();
-        putNewApple(); //spawn apples!
+        putNewApple();
       });
 
     snake.moveTo(nextPos);
@@ -128,20 +131,8 @@ async function drawLoop(canvas) {
 
   (function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //draw
 
     gameComponentContainer.forEach(gc => gc.draw(ctx));
-
-    function drawRotated(image, x, y, size, degrees) {
-      const radius = size / 2;
-      ctx.translate(x + radius, y + radius);
-      ctx.rotate((degrees * Math.PI) / 180);
-      ctx.translate(-x - radius, -y - radius);
-      ctx.drawImage(image, x, y, size, size);
-      ctx.translate(x + radius, y + radius);
-      ctx.rotate((-degrees * Math.PI) / 180);
-      ctx.translate(-x - radius, -y - radius);
-    }
 
     requestAnimationFrame(draw);
   })();
