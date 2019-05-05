@@ -13,6 +13,11 @@ export class Sprite extends Point {
     this.img = (await IMAGE_LIB).get(image);
   }
 
+  move({ x, y }) {
+    super.x = x;
+    super.y = y;
+  }
+
   draw(ctx) {
     if (!this.img) return;
 
