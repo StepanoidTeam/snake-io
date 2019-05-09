@@ -1,16 +1,16 @@
 import { Point, Sprite } from "./index.js";
 import { Container } from "./container.js";
-import { IMAGES } from "../images/index.js";
+import { SNAKE_TYPES, getRandomKey } from "../images/index.js";
 
 export class Snake extends Container {
-  constructor({ x, y }) {
+  constructor({ x, y, snakeType = getRandomKey(SNAKE_TYPES) }) {
     super();
     this.snakeParts = [new Point({ x, y })];
     this.sprites = {
       //todo: make body/joint recoloring here?
-      snakeHead: new Sprite({ x, y, image: IMAGES.SNAKE_HEAD_DEMON }),
-      snakeBody: new Sprite({ x, y, image: IMAGES.SNAKE_BODY }),
-      snakeJoint: new Sprite({ x, y, image: IMAGES.SNAKE_JOINT })
+      snakeHead: new Sprite({ x, y, image: snakeType.HEAD }),
+      snakeBody: new Sprite({ x, y, image: snakeType.BODY }),
+      snakeJoint: new Sprite({ x, y, image: snakeType.JOINT })
     };
   }
 
