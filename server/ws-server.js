@@ -19,14 +19,16 @@ function broadcast(data) {
 
 wss.on("connection", function connection(ws) {
   console.log("connected");
-  broadcast("@b:" + "connected someone else");
+
+  broadcast({ type: "CONNECTION", payload: "user connected" });
+  //sub to messages from new client
   ws.on("message", function incoming(message) {
     console.log("received: %s", message);
-    ws.send("yes it is111");
-    broadcast("@b:" + message);
+    ws.send(JSON.stringify({ type: "RESPONSE", payload: "message received" }));
+    broadcast({ type: "RESEND", payload: message });
   });
 
-  ws.send("something");
+  ws.send(JSON.stringify({ type: "CONNECTION", payload: "connected" }));
 });
 
 function stopWsServer() {
