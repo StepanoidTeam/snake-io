@@ -32,6 +32,13 @@ export class Snake extends Container {
     this.snakeParts.shift();
   }
 
+  split(point) {
+    const splitIndex = this.snakeParts.findIndex(sp => sp.collidesWith(point));
+
+    const tail = this.snakeParts.splice(0, splitIndex);
+    console.log("snake split", tail, splitIndex);
+  }
+
   moveTo({ x, y }) {
     this.snakeParts.push(new Point({ x, y }));
     this.shrink();

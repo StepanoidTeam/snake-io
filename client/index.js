@@ -104,15 +104,12 @@ function initNewGame(deadFn, getInput) {
     }
 
     //eats itself
-    [...snake.snakeParts].forEach((snakePart, partIndex) => {
-      if (snake.head() === snakePart) return; //same
-      if (snake.head().collidesWith(snakePart)) {
-        //todo: break loop!
-        const deadTail = snake.snakeParts.splice(0, partIndex);
-        console.log(deadTail, partIndex);
-        //todo: animate deadtail?
-      }
-    });
+    snake.snakeParts
+      .filter(
+        snakePart =>
+          snake.head() !== snakePart && snake.head().collidesWith(snakePart)
+      )
+      .forEach(snakePart => snake.split(snakePart));
 
     //eat apples
     [...apples.values()]
@@ -123,7 +120,7 @@ function initNewGame(deadFn, getInput) {
         reducer({ type: "APPLES", payload: getState().apples + 1 });
 
         snake.grow();
-        wasGrowed = true;
+
         //spawn apples!
         putNewApple();
         putNewApple();
