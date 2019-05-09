@@ -17,14 +17,29 @@ app.use("/score", scoreRouter);
 const port = 3000; //todo: get from config?
 const wsPort = 8080;
 const server = app.listen(port, function() {
-  //todo: add url to open site in browser from console
-  console.log(`Snake.io listening on port ${port}!`);
+  console.log(`Snake.io listening on http://localhost:${port}`);
 });
 
 const WebSocket = require("ws");
 
 const wss = new WebSocket.Server({ port: wsPort });
 console.log(`websocket listening on port ${wsPort}`);
+
+function closeHttpServer() {
+  console.log("⏳  closing http server...");
+  return new Promise(resolve => {
+    console.log("🛑  http server closed.");
+    server.close(() => resolve());
+  });
+}
+
+function closeWsServer() {
+  console.log("⏳  closing websocket server...");
+  return new Promise(resolve => {
+    console.log("🛑  websocket server closed.");
+    wss.close(() => resolve());
+  });
+}
 
 function broadcast(msg) {
   if (wss && wss.clients)
@@ -47,17 +62,13 @@ wss.on("connection", function connection(ws) {
   ws.send("something");
 });
 
-//add sigterm event
-process.on("SIGINT", () => {
-  console.info("SIGINT signal received.");
+async function stopServer() {
   saveHiScores();
-  console.log("Closing http server.");
-  server.close(() => {
-    console.log("Http server closed.");
 
-    wss.close(() => {
-      console.log("WS Server Stopped.");
-      process.exit(0);
-    });
-  });
-});
+  await Promise.all([closeHttpServer(), closeWsServer()]);
+
+  process.exit(0);
+}
+
+process.on("SIGINT", stopServer);
+process.on("SIGTERM", stopServer);
