@@ -7,12 +7,13 @@ const wss = new WebSocket.Server({ port: wsPort }, () => {
   console.log(`🌐  websocket server started, on port ${wsPort}`);
 });
 
-function broadcast(msg) {
+function broadcast(data) {
+  const json = JSON.stringify(data);
   if (wss && wss.clients)
     [...wss.clients]
       .filter(client => client.readyState === WebSocket.OPEN)
       .forEach(client => {
-        client.send(msg);
+        client.send(json);
       });
 }
 
@@ -35,5 +36,9 @@ function stopWsServer() {
     wss.close(() => resolve());
   });
 }
+
+setInterval(() => {
+  broadcast({ type: "ONLINE", payload: wss.clients.size });
+}, 1000);
 
 module.exports = { stopWsServer };
