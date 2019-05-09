@@ -14,12 +14,11 @@ export const IMAGES = {
   //snake parts
   SNAKE_JOINT: "new-moon-symbol_1f311.png",
   SNAKE_BODY: "full-moon-symbol_1f315.png",
-  // SNAKE_HEAD: "pig-face_1f437.png",
-  //SNAKE_HEAD: "smiling-face-with-horns_1f608.png",
-  SNAKE_HEAD: "frog-face_1f438.png",
+
   SNAKE_HEAD_FROG: "frog-face_1f438.png",
   SNAKE_HEAD_DEMON: "smiling-face-with-horns_1f608.png",
-  SNAKE_HEAD_PIG: "pig-face_1f437.png"
+  SNAKE_HEAD_PIG: "pig-face_1f437.png",
+  SNAKE_HEAD_NIGGA: "new-moon-with-face_1f31a.png"
 };
 
 export const IMAGE_LIB = (async () => {
@@ -39,7 +38,7 @@ export const IMAGE_LIB = (async () => {
     IMAGES.SNAKE_BODY,
     recolorImage(
       _imageLib.get(IMAGES.SNAKE_BODY),
-      getMainColor(_imageLib.get(IMAGES.SNAKE_HEAD)) + recolorOpacity
+      getMainColor(_imageLib.get(IMAGES.SNAKE_HEAD_DEMON)) + recolorOpacity
     )
   );
 
@@ -47,7 +46,7 @@ export const IMAGE_LIB = (async () => {
     IMAGES.SNAKE_JOINT,
     recolorImage(
       _imageLib.get(IMAGES.SNAKE_JOINT),
-      getMainColor(_imageLib.get(IMAGES.SNAKE_HEAD)) + recolorOpacity
+      getMainColor(_imageLib.get(IMAGES.SNAKE_HEAD_DEMON)) + recolorOpacity
     )
   );
 

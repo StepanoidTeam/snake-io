@@ -130,6 +130,21 @@ async function drawLoop(canvas) {
   const ctx = canvas.getContext("2d");
 
   (function draw() {
+    // from korablike
+    // function go(ts) {
+    //   requestAnimationFrame(go)
+    //   cham.update()
+    //   if (!ts) {
+    //     return
+    //   }
+    //   if (prevTs === false) {
+    //     prevTs = ts;
+    //     return;
+    //   }
+    //   var time = ts - prevTs
+    //   prevTs = ts
+    //   drawBullets(time)
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     gameComponentContainer.forEach(gc => gc.draw(ctx));

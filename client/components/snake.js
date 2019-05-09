@@ -8,7 +8,7 @@ export class Snake extends Container {
     this.snakeParts = [new Point({ x, y })];
     this.sprites = {
       //todo: make body/joint recoloring here?
-      snakeHead: new Sprite({ x, y, image: IMAGES.SNAKE_HEAD }),
+      snakeHead: new Sprite({ x, y, image: IMAGES.SNAKE_HEAD_DEMON }),
       snakeBody: new Sprite({ x, y, image: IMAGES.SNAKE_BODY }),
       snakeJoint: new Sprite({ x, y, image: IMAGES.SNAKE_JOINT })
     };
