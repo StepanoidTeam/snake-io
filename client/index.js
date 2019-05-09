@@ -1,9 +1,10 @@
-import {} from "./ws-client.js";
+import "./ws-client.js";
 import { setupControls } from "./controls/index.js";
 import { getScore, sendScore } from "./hi-scores.js";
 import { Apple, Point, Snake } from "./components/index.js";
 import { Container } from "./components/container.js";
 import { cellSizePx } from "./components/sprite.js";
+import { onStateChange, reducer, getState } from "./state.js";
 
 const fieldSizeCells = 20; // чем больше число тем больше матрица, то есть размер поля для змеи
 const speedMs = 120; // чем больше число тем медленее скорость змеи
@@ -14,6 +15,8 @@ const splashScreen = document.querySelector(".splash-screen");
 const gameOver = document.querySelector(".game-over");
 const btnStartGame = document.querySelector(".btn-start-game");
 const debug = document.querySelector(".debug");
+const statusOnline = document.querySelector(".status__online");
+const statusApples = document.querySelector(".status__apples");
 
 function updateScoreMessage(scores) {
   const listItems = scores.map(s => `<li>${s.name} - ${s.score}</li>`).join("");
@@ -45,7 +48,9 @@ function initNewGame(deadFn, getInput) {
   gameComponentContainer.clear();
 
   const apples = new Container();
-  let applesCollected = 0;
+
+  //todo: rewrite redux way
+  reducer({ type: "APPLES", payload: 0 });
 
   const snake = new Snake({ x: 5, y: 5 });
 
@@ -80,8 +85,9 @@ function initNewGame(deadFn, getInput) {
 
     if (snake.isDead()) {
       stopUpdates = true;
-      //todo: count apples, not snake len
-      deadFn(applesCollected);
+
+      //todo: get state using redux-like seletors?
+      deadFn(getState().apples);
       return;
     }
 
@@ -99,20 +105,25 @@ function initNewGame(deadFn, getInput) {
 
     //eats itself
     [...snake.snakeParts].forEach((snakePart, partIndex) => {
-      if (snakePart.collidesWith(nextPos)) {
+      if (snake.head() === snakePart) return; //same
+      if (snake.head().collidesWith(snakePart)) {
+        //todo: break loop!
         const deadTail = snake.snakeParts.splice(0, partIndex);
+        console.log(deadTail, partIndex);
         //todo: animate deadtail?
       }
     });
 
     //eat apples
     [...apples.values()]
-      .filter(apple => snake.head().collidesWith(apple))
+      .filter(apple => apple.collidesWith(snake.head()))
       .forEach(apple => {
         apples.delete(apple);
-        applesCollected++;
-        snake.grow(nextPos);
+        //todo: rewrite redux way
+        reducer({ type: "APPLES", payload: getState().apples + 1 });
 
+        snake.grow();
+        wasGrowed = true;
         //spawn apples!
         putNewApple();
         putNewApple();
@@ -165,7 +176,7 @@ async function drawLoop(canvas) {
   canvas.height = boardSize;
   drawLoop(canvas);
 
-  let getInput = setupControls();
+  const getInput = setupControls();
   let gameResult = null;
   while (true) {
     //wait for start
@@ -177,3 +188,8 @@ async function drawLoop(canvas) {
     await sendScore(gameResult).then(updateScoreMessage);
   }
 })();
+
+onStateChange(({ online, apples }) => {
+  statusOnline.innerHTML = `online: ${online}`;
+  statusApples.innerHTML = `🍎: ${apples}`;
+});

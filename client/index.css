@@ -56,6 +56,13 @@ canvas {
   visibility: hidden;
 }
 
+.status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 10px;
+}
+
 .game-over {
   font-size: 4em;
 }
