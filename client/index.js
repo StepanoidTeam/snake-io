@@ -85,9 +85,10 @@ function initNewGame(deadFn, getInput) {
 
     if (snake.isDead()) {
       stopUpdates = true;
+      console.log(snake);
 
       //todo: get state using redux-like seletors?
-      deadFn(getState().score);
+      deadFn({ score: getState().score, name: snake.snakeType });
       return;
     }
 

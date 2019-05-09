@@ -1,11 +1,11 @@
-export async function sendScore(score = 0) {
+export async function sendScore({ score = 0, name = "noname" }) {
   const rawResponse = await fetch("/score", {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ name: "bob", score })
+    body: JSON.stringify({ name, score })
   });
 
   const scores = await rawResponse.json();

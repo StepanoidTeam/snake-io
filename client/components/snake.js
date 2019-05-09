@@ -5,6 +5,7 @@ import { SNAKE_TYPES, getRandomKey } from "../images/index.js";
 export class Snake extends Container {
   constructor({ x, y, snakeType = getRandomKey(SNAKE_TYPES) }) {
     super();
+    this.snakeType = snakeType.name;
     this.snakeParts = [new Point({ x, y })];
     this.sprites = {
       //todo: make body/joint recoloring here?
