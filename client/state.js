@@ -1,6 +1,6 @@
 const state = {
   online: 0,
-  apples: 0
+  score: 0
 };
 
 const listeners = [];
@@ -16,8 +16,8 @@ function reducer(event) {
       state.online = event.payload;
       break;
     }
-    case "APPLES": {
-      state.apples = event.payload;
+    case "SCORE": {
+      state.score = event.payload;
       break;
     }
     default: {

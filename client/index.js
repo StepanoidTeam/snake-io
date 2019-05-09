@@ -1,7 +1,7 @@
 import "./ws-client.js";
 import { setupControls } from "./controls/index.js";
 import { getScore, sendScore } from "./hi-scores.js";
-import { Apple, Point, Snake } from "./components/index.js";
+import { Bonus, Point, Snake } from "./components/index.js";
 import { Container } from "./components/container.js";
 import { cellSizePx } from "./components/sprite.js";
 import { onStateChange, reducer, getState } from "./state.js";
@@ -16,7 +16,7 @@ const gameOver = document.querySelector(".game-over");
 const btnStartGame = document.querySelector(".btn-start-game");
 const debug = document.querySelector(".debug");
 const statusOnline = document.querySelector(".status__online");
-const statusApples = document.querySelector(".status__apples");
+const statusScore = document.querySelector(".status__score");
 
 function updateScoreMessage(scores) {
   const listItems = scores.map(s => `<li>${s.name} - ${s.score}</li>`).join("");
@@ -47,24 +47,24 @@ const gameComponentContainer = new Set();
 function initNewGame(deadFn, getInput) {
   gameComponentContainer.clear();
 
-  const apples = new Container();
+  const bonuses = new Container();
 
   //todo: rewrite redux way
-  reducer({ type: "APPLES", payload: 0 });
+  reducer({ type: "SCORE", payload: 0 });
 
   const snake = new Snake({ x: 5, y: 5 });
 
-  gameComponentContainer.add(apples);
+  gameComponentContainer.add(bonuses);
   gameComponentContainer.add(snake);
 
-  function putNewApple() {
+  function putNewBonus() {
     let x = Math.floor(Math.random() * fieldSizeCells);
     let y = Math.floor(Math.random() * fieldSizeCells);
 
-    apples.add(new Apple({ x, y }));
+    bonuses.add(new Bonus({ x, y }));
   }
 
-  putNewApple();
+  putNewBonus();
 
   let stopUpdates = false;
   let lastRender = 0;
@@ -87,7 +87,7 @@ function initNewGame(deadFn, getInput) {
       stopUpdates = true;
 
       //todo: get state using redux-like seletors?
-      deadFn(getState().apples);
+      deadFn(getState().score);
       return;
     }
 
@@ -111,19 +111,19 @@ function initNewGame(deadFn, getInput) {
       )
       .forEach(snakePart => snake.split(snakePart));
 
-    //eat apples
-    [...apples.values()]
-      .filter(apple => apple.collidesWith(snake.head()))
-      .forEach(apple => {
-        apples.delete(apple);
+    //eat bonuses
+    [...bonuses.values()]
+      .filter(bonus => bonus.collidesWith(snake.head()))
+      .forEach(bonus => {
+        bonuses.delete(bonus);
         //todo: rewrite redux way
-        reducer({ type: "APPLES", payload: getState().apples + 1 });
+        reducer({ type: "SCORE", payload: getState().score + 1 });
 
         snake.grow();
 
-        //spawn apples!
-        putNewApple();
-        putNewApple();
+        //spawn bonuses!
+        putNewBonus();
+        putNewBonus();
       });
 
     snake.moveTo(nextPos);
@@ -186,7 +186,7 @@ async function drawLoop(canvas) {
   }
 })();
 
-onStateChange(({ online, apples }) => {
+onStateChange(({ online, score }) => {
   statusOnline.innerHTML = `online: ${online}`;
-  statusApples.innerHTML = `🍎: ${apples}`;
+  statusScore.innerHTML = `🍎: ${score}`;
 });

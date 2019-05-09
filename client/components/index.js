@@ -1,6 +1,6 @@
 import { Point } from "./point.js";
 import { Snake } from "./snake.js";
 import { Sprite } from "./sprite.js";
-import { Apple } from "./apple.js";
+import { Bonus } from "./bonus.js";
 
-export { Point, Snake, Sprite, Apple };
+export { Point, Snake, Sprite, Bonus };
