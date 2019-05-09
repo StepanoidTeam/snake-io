@@ -19,8 +19,13 @@ export class Snake extends Container {
     return head;
   }
 
-  grow({ x, y }) {
-    this.snakeParts.push(new Point({ x, y }));
+  tail() {
+    const [tail] = this.snakeParts.slice(0, 1);
+    return tail;
+  }
+
+  grow() {
+    this.snakeParts.unshift(new Point(this.tail()));
   }
 
   shrink() {
@@ -28,7 +33,7 @@ export class Snake extends Container {
   }
 
   moveTo({ x, y }) {
-    this.grow({ x, y });
+    this.snakeParts.push(new Point({ x, y }));
     this.shrink();
   }
 
