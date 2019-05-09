@@ -51,7 +51,7 @@ function arrayToObject(array) {
 
 export function getRandomKey(obj) {
   const keys = Object.keys(obj);
-  const index = Math.floor(Math.random() * keys.length + 1);
+  const index = Math.floor(Math.random() * keys.length);
 
   return obj[keys[index]];
 }
@@ -69,6 +69,7 @@ export const SNAKE_TYPES = arrayToObject(
     const keys = getSnakeKeys(head);
     return {
       [head]: {
+        name: head,
         HEAD: IMAGES[head],
         BODY: keys.bodyKey,
         JOINT: keys.jointKey
