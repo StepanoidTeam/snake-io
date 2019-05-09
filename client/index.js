@@ -93,7 +93,7 @@ function initNewGame(deadFn, getInput) {
       nextPos.x < 0 ||
       nextPos.x > fieldSizeCells - 1
     ) {
-      snake.snakeParts.shift();
+      snake.shrink();
       return;
     }
 
