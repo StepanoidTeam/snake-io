@@ -1,11 +1,6 @@
 var express = require("express");
 var app = express();
-
-//todo (@nik): add your buffer implementation here
-//to keep only top 10 results for hi-scores
-//sort by score
-//keep only 1 user with unique name
-var users = [];
+var { scoreRouter } = require("./server/score");
 
 //todo: log requested url/method/body
 app.use((req, res, next) => {
@@ -15,24 +10,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.static("client"));
-
-app.get("/getScore", function(req, res) {
-  res.json(users);
-});
-
-app.post("/setScore", function(req, res) {
-  console.log(req.body);
-  //todo: check validity of user
-  //do not push random shit
-  let user = req.body;
-
-  users.splice(10);
-  users.unshift(user);
-
-  broadcast(JSON.stringify(user));
-
-  res.json(users);
-});
+app.use("/score", scoreRouter);
 
 //todo: add & handle websocket connections (use ws lib?)
 

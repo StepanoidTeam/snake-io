@@ -1,5 +1,5 @@
 export async function sendScore(score = 0) {
-  const rawResponse = await fetch("/setScore", {
+  const rawResponse = await fetch("/score", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -13,7 +13,7 @@ export async function sendScore(score = 0) {
 }
 
 export async function getScore() {
-  const rawResponse = await fetch("/getScore", {
+  const rawResponse = await fetch("/score", {
     method: "GET",
     headers: {
       Accept: "application/json",
