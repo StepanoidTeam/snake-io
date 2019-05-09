@@ -1,6 +1,6 @@
 var express = require("express");
 var app = express();
-var { scoreRouter } = require("./server/score");
+var { scoreRouter, saveHiScores } = require("./server/score");
 
 //todo: log requested url/method/body
 app.use((req, res, next) => {
@@ -16,7 +16,7 @@ app.use("/score", scoreRouter);
 
 const port = 3000; //todo: get from config?
 const wsPort = 8080;
-app.listen(port, function() {
+const server = app.listen(port, function() {
   //todo: add url to open site in browser from console
   console.log(`Snake.io listening on port ${port}!`);
 });
@@ -45,4 +45,19 @@ wss.on("connection", function connection(ws) {
   });
 
   ws.send("something");
+});
+
+//add sigterm event
+process.on("SIGINT", () => {
+  console.info("SIGINT signal received.");
+  saveHiScores();
+  console.log("Closing http server.");
+  server.close(() => {
+    console.log("Http server closed.");
+
+    wss.close(() => {
+      console.log("WS Server Stopped.");
+      process.exit(0);
+    });
+  });
 });
