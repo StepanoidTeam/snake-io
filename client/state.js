@@ -1,6 +1,14 @@
 const state = {
-  online: 0
+  online: 0,
+  apples: 0
 };
+
+const listeners = [];
+
+//todo: make unsubscibe method
+function onStateChange(callback) {
+  listeners.push(callback);
+}
 
 function reducer(event) {
   switch (event.type) {
@@ -8,10 +16,20 @@ function reducer(event) {
       state.online = event.payload;
       break;
     }
+    case "APPLES": {
+      state.apples = event.payload;
+      break;
+    }
     default: {
-      console.log("⚠", event);
+      console.log("⚠️", event);
     }
   }
+
+  listeners.forEach(listener => listener(state));
 }
 
-export { state };
+function getState() {
+  return state;
+}
+
+export { getState, reducer, onStateChange };
