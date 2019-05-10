@@ -16,31 +16,24 @@ const hiScoresFilePath = "./scores.json";
 //keep only 1 user with unique name
 
 function scoreNormalize(scoreArr, scoreItem) {
-  if (scoreArr.length == 0) {
-    scoreArr.unshift(scoreItem);
+  let playerIndex = scoreArr.findIndex(item => {
+    return item.name == scoreItem.name;
+  });
+
+  let playerScoreIndex = scoreArr.findIndex(item => {
+    return scoreItem.score >= item.score;
+  });
+
+  playerScoreIndex =
+    playerScoreIndex == -1 ? scoreArr.length - 1 : playerScoreIndex;
+
+  if (playerIndex != -1) {
+    scoreArr.splice(playerIndex, 1, scoreItem);
     return scoreArr;
   }
-  if (!scoreArr) return (scoreArr = [].unshift(scoreItem));
-  let normalizedScore = scoreArr;
 
-  let isNameExist = false;
-  normalizedScore.forEach(item => {
-    if (item.name === scoreItem.name) isNameExist = true;
-    if (item.name === scoreItem.name && item.score < scoreItem.score) {
-      item.score = scoreItem.score;
-    }
-  });
-
-  if (!isNameExist) {
-    normalizedScore.unshift(scoreItem);
-    isNameExist = false;
-  }
-
-  normalizedScore.sort((a, b) => {
-    return b.score - a.score;
-  });
-  normalizedScore.splice(10);
-  return normalizedScore;
+  scoreArr.splice(playerScoreIndex, 0, scoreItem);
+  return scoreArr;
 }
 
 var hiScores = readJSONArray(hiScoresFilePath);
