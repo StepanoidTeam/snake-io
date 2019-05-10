@@ -1,9 +1,7 @@
-var express = require("express");
-var { appendJSONToFile, readJSONArray, clearFile } = require("./helpers/file");
-
-var scoreRouter = express.Router();
-
 const express = require("express");
+
+const scoreRouter = express.Router();
+
 const {
   appendJSONToFile,
   readJSONArray,
@@ -11,8 +9,6 @@ const {
 } = require("./helpers/file");
 
 const hiScoresFilePath = "./scores.json";
-
-const scoreRouter = express.Router();
 
 //todo (@nik): add your buffer implementation here
 //to keep only top 10 results for hi-scores
@@ -41,7 +37,7 @@ function scoreNormalize(scoreArr, scoreItem) {
   }
 
   normalizedScore.sort((a, b) => {
-    return a.score - b.score;
+    return b.score - a.score;
   });
   normalizedScore.splice(10);
   return normalizedScore;
