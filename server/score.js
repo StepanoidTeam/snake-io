@@ -3,6 +3,17 @@ var { appendJSONToFile, readJSONArray, clearFile } = require("./helpers/file");
 
 var scoreRouter = express.Router();
 
+const express = require("express");
+const {
+  appendJSONToFile,
+  readJSONArray,
+  clearFile
+} = require("./helpers/file");
+
+const hiScoresFilePath = "./scores.json";
+
+const scoreRouter = express.Router();
+
 //todo (@nik): add your buffer implementation here
 //to keep only top 10 results for hi-scores
 //sort by score
@@ -36,7 +47,7 @@ function scoreNormalize(scoreArr, scoreItem) {
   return normalizedScore;
 }
 
-var hiScores = readJSONArray("./scores.json");
+var hiScores = readJSONArray(hiScoresFilePath);
 
 // middleware that is specific to this router
 // router.use(function timeLog(req, res, next) {
@@ -62,8 +73,9 @@ scoreRouter.post("/", function(req, res) {
 });
 
 function saveHiScores() {
-  clearFile("./scores.json");
-  hiScores.forEach(score => appendJSONToFile("./scores.json", score));
+  clearFile(hiScoresFilePath);
+  hiScores.forEach(score => appendJSONToFile(hiScoresFilePath, score));
+  console.log(`💾  hiScores saved to ${hiScoresFilePath}`);
 }
 
 module.exports = { scoreRouter, saveHiScores };

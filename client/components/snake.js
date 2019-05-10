@@ -1,16 +1,17 @@
 import { Point, Sprite } from "./index.js";
 import { Container } from "./container.js";
-import { IMAGES } from "../images/index.js";
+import { SNAKE_TYPES, getRandomKey } from "../images/index.js";
 
 export class Snake extends Container {
-  constructor({ x, y }) {
+  constructor({ x, y, snakeType = getRandomKey(SNAKE_TYPES) }) {
     super();
+    this.snakeType = snakeType.name;
     this.snakeParts = [new Point({ x, y })];
     this.sprites = {
       //todo: make body/joint recoloring here?
-      snakeHead: new Sprite({ x, y, image: IMAGES.SNAKE_HEAD }),
-      snakeBody: new Sprite({ x, y, image: IMAGES.SNAKE_BODY }),
-      snakeJoint: new Sprite({ x, y, image: IMAGES.SNAKE_JOINT })
+      snakeHead: new Sprite({ x, y, image: snakeType.HEAD }),
+      snakeBody: new Sprite({ x, y, image: snakeType.BODY }),
+      snakeJoint: new Sprite({ x, y, image: snakeType.JOINT })
     };
   }
 
@@ -19,16 +20,28 @@ export class Snake extends Container {
     return head;
   }
 
-  grow({ x, y }) {
-    this.snakeParts.push(new Point({ x, y }));
+  tail() {
+    const [tail] = this.snakeParts.slice(0, 1);
+    return tail;
+  }
+
+  grow() {
+    this.snakeParts.unshift(new Point(this.tail()));
   }
 
   shrink() {
     this.snakeParts.shift();
   }
 
+  split(point) {
+    const splitIndex = this.snakeParts.findIndex(sp => sp.collidesWith(point));
+
+    const tail = this.snakeParts.splice(0, splitIndex);
+    console.log("snake split", tail, splitIndex);
+  }
+
   moveTo({ x, y }) {
-    this.grow({ x, y });
+    this.snakeParts.push(new Point({ x, y }));
     this.shrink();
   }
 

@@ -1,9 +1,10 @@
-import {} from "./ws-client.js";
+import "./ws-client.js";
 import { setupControls } from "./controls/index.js";
 import { getScore, sendScore } from "./hi-scores.js";
-import { Apple, Point, Snake } from "./components/index.js";
+import { Bonus, Point, Snake } from "./components/index.js";
 import { Container } from "./components/container.js";
 import { cellSizePx } from "./components/sprite.js";
+import { onStateChange, reducer, getState } from "./state.js";
 
 const fieldSizeCells = 20; // чем больше число тем больше матрица, то есть размер поля для змеи
 const speedMs = 120; // чем больше число тем медленее скорость змеи
@@ -14,6 +15,8 @@ const splashScreen = document.querySelector(".splash-screen");
 const gameOver = document.querySelector(".game-over");
 const btnStartGame = document.querySelector(".btn-start-game");
 const debug = document.querySelector(".debug");
+const statusOnline = document.querySelector(".status__online");
+const statusScore = document.querySelector(".status__score");
 
 function updateScoreMessage(scores) {
   const listItems = scores.map(s => `<li>${s.name} - ${s.score}</li>`).join("");
@@ -44,22 +47,24 @@ const gameComponentContainer = new Set();
 function initNewGame(deadFn, getInput) {
   gameComponentContainer.clear();
 
-  const apples = new Container();
-  let applesCollected = 0;
+  const bonuses = new Container();
+
+  //todo: rewrite redux way
+  reducer({ type: "SCORE", payload: 0 });
 
   const snake = new Snake({ x: 5, y: 5 });
 
-  gameComponentContainer.add(apples);
+  gameComponentContainer.add(bonuses);
   gameComponentContainer.add(snake);
 
-  function putNewApple() {
+  function putNewBonus() {
     let x = Math.floor(Math.random() * fieldSizeCells);
     let y = Math.floor(Math.random() * fieldSizeCells);
 
-    apples.add(new Apple({ x, y }));
+    bonuses.add(new Bonus({ x, y }));
   }
 
-  putNewApple();
+  putNewBonus();
 
   let stopUpdates = false;
   let lastRender = 0;
@@ -80,8 +85,10 @@ function initNewGame(deadFn, getInput) {
 
     if (snake.isDead()) {
       stopUpdates = true;
-      //todo: count apples, not snake len
-      deadFn(applesCollected);
+      console.log(snake);
+
+      //todo: get state using redux-like seletors?
+      deadFn({ score: getState().score, name: snake.snakeType });
       return;
     }
 
@@ -93,29 +100,31 @@ function initNewGame(deadFn, getInput) {
       nextPos.x < 0 ||
       nextPos.x > fieldSizeCells - 1
     ) {
-      snake.snakeParts.shift();
+      snake.shrink();
       return;
     }
 
     //eats itself
-    [...snake.snakeParts].forEach((snakePart, partIndex) => {
-      if (snakePart.collidesWith(nextPos)) {
-        const deadTail = snake.snakeParts.splice(0, partIndex);
-        //todo: animate deadtail?
-      }
-    });
+    snake.snakeParts
+      .filter(
+        snakePart =>
+          snake.head() !== snakePart && snake.head().collidesWith(snakePart)
+      )
+      .forEach(snakePart => snake.split(snakePart));
 
-    //eat apples
-    [...apples.values()]
-      .filter(apple => snake.head().collidesWith(apple))
-      .forEach(apple => {
-        apples.delete(apple);
-        applesCollected++;
-        snake.grow(nextPos);
+    //eat bonuses
+    [...bonuses.values()]
+      .filter(bonus => bonus.collidesWith(snake.head()))
+      .forEach(bonus => {
+        bonuses.delete(bonus);
+        //todo: rewrite redux way
+        reducer({ type: "SCORE", payload: getState().score + 1 });
 
-        //spawn apples!
-        putNewApple();
-        putNewApple();
+        snake.grow();
+
+        //spawn bonuses!
+        putNewBonus();
+        putNewBonus();
       });
 
     snake.moveTo(nextPos);
@@ -130,6 +139,21 @@ async function drawLoop(canvas) {
   const ctx = canvas.getContext("2d");
 
   (function draw() {
+    // from korablike
+    // function go(ts) {
+    //   requestAnimationFrame(go)
+    //   cham.update()
+    //   if (!ts) {
+    //     return
+    //   }
+    //   if (prevTs === false) {
+    //     prevTs = ts;
+    //     return;
+    //   }
+    //   var time = ts - prevTs
+    //   prevTs = ts
+    //   drawBullets(time)
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     gameComponentContainer.forEach(gc => gc.draw(ctx));
@@ -150,7 +174,7 @@ async function drawLoop(canvas) {
   canvas.height = boardSize;
   drawLoop(canvas);
 
-  let getInput = setupControls();
+  const getInput = setupControls();
   let gameResult = null;
   while (true) {
     //wait for start
@@ -162,3 +186,8 @@ async function drawLoop(canvas) {
     await sendScore(gameResult).then(updateScoreMessage);
   }
 })();
+
+onStateChange(({ online, score }) => {
+  statusOnline.innerHTML = `online: ${online}`;
+  statusScore.innerHTML = `🍎: ${score}`;
+});
