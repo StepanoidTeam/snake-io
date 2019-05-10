@@ -183,7 +183,9 @@ async function drawLoop(canvas) {
     gameResult = await promisify(initNewGame, getInput);
 
     gameOver.classList.remove("hidden");
-    await sendScore(gameResult).then(updateScoreMessage);
+    await sendScore(gameResult)
+      .then(updateScoreMessage)
+      .catch(error => console.error(error));
   }
 })();
 
