@@ -4,7 +4,8 @@
   "description": "snake io attempt for nik to learn server side js and so on",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -19,5 +20,8 @@
   "dependencies": {
     "express": "^4.16.4",
     "ws": "^6.1.4"
+  },
+  "devDependencies": {
+    "jest": "*"
   }
 }
