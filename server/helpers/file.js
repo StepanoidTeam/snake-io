@@ -48,9 +48,21 @@ function readLines(filepath) {
 
 function readJSONArray(filepath) {
   var lines = readLines(filepath);
-  lines.pop();
+  lines.pop(); //remove empty line
   var parsedLines = lines.map(str => JSON.parse(str));
   return parsedLines;
+}
+
+/**
+ * appends/overrides array to file as JSON line by line
+ * @param {string} filepath path to file
+ * @param {Array} arrayData object to serialize
+ * @param {bool} override override whole file or append data
+ */
+function writeJSONArray(filepath, arrayData, override = false) {
+  if (override) clearFile(filepath);
+
+  arrayData.forEach(data => appendJSONToFile(filepath, data));
 }
 
 function clearFile(filepath) {
@@ -67,5 +79,6 @@ module.exports = {
   appendJSONToFile,
   readLines,
   readJSONArray,
+  writeJSONArray,
   clearFile
 };
