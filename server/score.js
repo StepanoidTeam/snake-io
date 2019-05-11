@@ -2,20 +2,15 @@ const express = require("express");
 
 const scoreRouter = express.Router();
 
-const {
-  appendJSONToFile,
-  readJSONArray,
-  clearFile
-} = require("./helpers/file");
+const { writeJSONArray, readJSONArray } = require("./helpers/file");
 
 const hiScoresFilePath = "./scores.json";
 
-//todo (@nik): add your buffer implementation here
 //to keep only top 10 results for hi-scores
 //sort by score
 //keep only 1 user with unique name
 
-function scoreNormalize(scoreArr, scoreItem) {
+function updateScore(scoreArr, scoreItem) {
   let playerIndex = scoreArr.findIndex(item => {
     return item.name == scoreItem.name;
   });
@@ -54,7 +49,7 @@ scoreRouter.post("/", function(req, res) {
   //do not push random shit
   let user = req.body;
 
-  hiScores = scoreNormalize(hiScores, user);
+  hiScores = updateScore(hiScores, user);
 
   //   broadcast(JSON.stringify(user));
 
@@ -62,9 +57,9 @@ scoreRouter.post("/", function(req, res) {
 });
 
 function saveHiScores() {
-  clearFile(hiScoresFilePath);
-  hiScores.forEach(score => appendJSONToFile(hiScoresFilePath, score));
+  writeJSONArray(hiScoresFilePath, hiScores);
+
   console.log(`💾  hiScores saved to ${hiScoresFilePath}`);
 }
 
-module.exports = { scoreRouter, saveHiScores };
+module.exports = { scoreRouter, saveHiScores, updateScore };
