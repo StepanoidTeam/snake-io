@@ -1,26 +1,23 @@
-let nextMoveX = 1; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
-let nextMoveY = 0; // ед.измерения след.шага.Если меняю на большие числа,то змея дробится
+import { DIRECTION } from "./direction.js";
+
+let nextMove = DIRECTION.RIGHT;
 
 function checkKey({ code }) {
   switch (code) {
     case "ArrowUp": {
-      nextMoveX = 0;
-      nextMoveY = -1;
+      nextMove = DIRECTION.UP;
       break;
     }
     case "ArrowDown": {
-      nextMoveX = 0;
-      nextMoveY = 1;
+      nextMove = DIRECTION.DOWN;
       break;
     }
     case "ArrowLeft": {
-      nextMoveX = -1;
-      nextMoveY = 0;
+      nextMove = DIRECTION.LEFT;
       break;
     }
     case "ArrowRight": {
-      nextMoveX = 1;
-      nextMoveY = 0;
+      nextMove = DIRECTION.RIGHT;
       break;
     }
   }
@@ -29,5 +26,5 @@ function checkKey({ code }) {
 export function initKeyboard() {
   document.body.addEventListener("keydown", checkKey);
 
-  return () => ({ x: nextMoveX, y: nextMoveY });
+  return () => nextMove;
 }
