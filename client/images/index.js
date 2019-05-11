@@ -119,8 +119,6 @@ export const IMAGE_LIB = (async () => {
 
   Object.assign(IMAGES, arrayToObject(dynamicImageKeys));
 
-  console.log(IMAGES);
-
   return _imageLib;
 })();
 
