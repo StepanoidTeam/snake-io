@@ -1,13 +1,8 @@
-const MOVE = {
-  LEFT: { x: -1, y: 0 },
-  UP: { x: 0, y: -1 },
-  RIGHT: { x: +1, y: 0 },
-  DOWN: { x: 0, y: +1 }
-};
+import { DIRECTION } from "./direction.js";
 
 let tStartX;
 let tStartY;
-let nextMove = MOVE.RIGHT;
+let nextMove = DIRECTION.RIGHT;
 
 function handleStart(event) {
   tStartX = event.touches[0].screenX;
@@ -21,9 +16,9 @@ function handleEnd(event) {
   let totalY = tStartY - tEndY;
 
   if (Math.abs(totalX) > Math.abs(totalY)) {
-    totalX >= 0 ? (nextMove = MOVE.LEFT) : (nextMove = MOVE.RIGHT);
+    totalX >= 0 ? (nextMove = DIRECTION.LEFT) : (nextMove = DIRECTION.RIGHT);
   } else {
-    totalY >= 0 ? (nextMove = MOVE.UP) : (nextMove = MOVE.DOWN);
+    totalY >= 0 ? (nextMove = DIRECTION.UP) : (nextMove = DIRECTION.DOWN);
   }
 }
 
