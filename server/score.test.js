@@ -7,13 +7,7 @@ function player(index = 1, score = 1) {
 describe(updateScore.name, () => {
   describe("player add to", () => {
     test("top", () => {
-      const score = [
-        player(4, 4),
-        player(3, 3),
-        player(2, 2),
-        player(1, 1),
-        player(0, 0)
-      ];
+      const score = [player(4, 4), player(3, 3), player(2, 2), player(1, 1)];
 
       const result = updateScore(score, player(5, 5));
 
@@ -27,13 +21,7 @@ describe(updateScore.name, () => {
     });
 
     test("bottom", () => {
-      const score = [
-        player(5, 5),
-        player(4, 4),
-        player(3, 3),
-        player(2, 2),
-        player(0, 0)
-      ];
+      const score = [player(5, 5), player(4, 4), player(3, 3), player(2, 2)];
 
       const result = updateScore(score, player(1, 1));
 
@@ -47,7 +35,7 @@ describe(updateScore.name, () => {
     });
 
     test("middle", () => {
-      const score = [player(4, 4), player(3, 3), player(1, 1), player(0, 0)];
+      const score = [player(4, 4), player(3, 3), player(1, 1)];
 
       const result = updateScore(score, player(2, 2));
 

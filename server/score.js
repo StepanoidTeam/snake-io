@@ -10,6 +10,8 @@ const hiScoresFilePath = "./scores.json";
 //sort by score
 //keep only 1 user with unique name
 
+const TOP_SCORE_LENGTH = 10;
+
 function updateScore(scoreArr, scoreItem = {}) {
   if (!scoreArr) return [scoreItem];
 
@@ -31,9 +33,12 @@ function updateScore(scoreArr, scoreItem = {}) {
 
   if (isTopScore) {
     scoreArr.splice(playerScorePosIndex, 0, scoreItem);
-    scoreArr.splice(scoreArr.length - 1, 1);
+    scoreArr.splice(TOP_SCORE_LENGTH, 1);
     return scoreArr;
   }
+
+  scoreArr.push(scoreItem);
+  scoreArr.splice(TOP_SCORE_LENGTH);
   return scoreArr;
 }
 
