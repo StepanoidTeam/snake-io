@@ -1,6 +1,7 @@
 import { getImage } from "../helpers/get-image.js";
 import { recolorImage } from "../helpers/recolor-image.js";
 import { getMainColor } from "../helpers/get-main-color.js";
+import { getRandomIndex } from "../helpers/get-random-index.js";
 
 const HEADS = {
   //animals
@@ -51,7 +52,7 @@ function arrayToObject(array) {
 
 export function getRandomKey(obj) {
   const keys = Object.keys(obj);
-  const index = Math.floor(Math.random() * keys.length);
+  const index = getRandomIndex(keys.length);
 
   return obj[keys[index]];
 }

@@ -5,10 +5,9 @@ import { Bonus, Point, Snake } from "./components/index.js";
 import { Container } from "./components/container.js";
 import { cellSizePx } from "./components/sprite.js";
 import { onStateChange, reducer, getState } from "./state.js";
+import { getRandomIndex } from "./helpers/get-random-index.js";
 
-const fieldSizeCells = 20; // чем больше число тем больше матрица, то есть размер поля для змеи
-const speedMs = 120; // чем больше число тем медленее скорость змеи
-// тут наверное вызывается функция и ей передаются параметры. Пыталась добавить еще параметр,но игнорит
+const fieldSizeCells = 20;
 
 const scoreMessageBlock = document.querySelector(".high-scores");
 const splashScreen = document.querySelector(".splash-screen");
@@ -58,8 +57,8 @@ function initNewGame(deadFn, getInput) {
   gameComponentContainer.add(snake);
 
   function putNewBonus() {
-    let x = Math.floor(Math.random() * fieldSizeCells);
-    let y = Math.floor(Math.random() * fieldSizeCells);
+    const x = getRandomIndex(fieldSizeCells);
+    const y = getRandomIndex(fieldSizeCells);
 
     bonuses.add(new Bonus({ x, y }));
   }
