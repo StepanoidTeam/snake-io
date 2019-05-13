@@ -108,5 +108,105 @@ describe(updateScore.name, () => {
         player(2, 12)
       ]);
     });
+
+    // ON FULL STACK
+
+    test("full stack update bottom-to-top", () => {
+      const score = [
+        player(10, 10),
+        player(9, 9),
+        player(8, 8),
+        player(7, 7),
+        player(6, 6),
+        player(5, 5),
+        player(4, 4),
+        player(3, 3),
+        player(2, 2),
+        player(1, 1)
+      ];
+
+      const result = updateScore(score, player(1, 20));
+
+      expect(result).toEqual([
+        player(1, 20),
+        player(10, 10),
+        player(9, 9),
+        player(8, 8),
+        player(7, 7),
+        player(6, 6),
+        player(5, 5),
+        player(4, 4),
+        player(3, 3),
+        player(2, 2)
+      ]);
+    });
+
+    test("full stack new player", () => {
+      const score = [
+        player(10, 10),
+        player(9, 9),
+        player(8, 8),
+        player(7, 7),
+        player(6, 6),
+        player(5, 5),
+        player(4, 4),
+        player(3, 3),
+        player(2, 2),
+        player(1, 1)
+      ];
+
+      const result = updateScore(score, player(20, 20));
+
+      expect(result).toEqual([
+        player(20, 20),
+        player(10, 10),
+        player(9, 9),
+        player(8, 8),
+        player(7, 7),
+        player(6, 6),
+        player(5, 5),
+        player(4, 4),
+        player(3, 3),
+        player(2, 2)
+      ]);
+    });
+
+    test("cumulative updates", () => {
+      const score = [];
+
+      let result;
+      result = updateScore(score, player(1, 1));
+      result = updateScore(score, player(10, 10));
+      result = updateScore(score, player(2, 2));
+      result = updateScore(score, player(9, 9));
+      result = updateScore(score, player(3, 3));
+
+      expect(result).toEqual([
+        player(10, 10),
+        player(9, 9),
+        player(3, 3),
+        player(2, 2),
+        player(1, 1)
+      ]);
+
+      result = updateScore(score, player(8, 8));
+      result = updateScore(score, player(4, 4));
+      result = updateScore(score, player(7, 7));
+      result = updateScore(score, player(5, 5));
+      result = updateScore(score, player(6, 6));
+
+      expect(result).toEqual([
+        player(10, 10),
+        player(9, 9),
+        player(8, 8),
+        player(7, 7),
+        player(6, 6),
+        player(5, 5),
+        player(4, 4),
+        player(3, 3),
+        player(2, 2),
+        player(1, 1)
+      ]);
+    });
   });
 });
