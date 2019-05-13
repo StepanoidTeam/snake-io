@@ -2,7 +2,7 @@ const express = require("express");
 
 const scoreRouter = express.Router();
 
-const { writeJSONArray, readJSONArray } = require("./helpers/file");
+const { writeJSONArray, readJSONArray, clearFile } = require("./helpers/file");
 
 const hiScoresFilePath = "./scores.json";
 
@@ -10,24 +10,35 @@ const hiScoresFilePath = "./scores.json";
 //sort by score
 //keep only 1 user with unique name
 
-function updateScore(scoreArr, scoreItem) {
-  let playerIndex = scoreArr.findIndex(item => {
+const TOP_SCORE_LENGTH = 10;
+
+function updateScore(scoreArr, scoreItem = {}) {
+  if (!scoreArr) return [scoreItem];
+
+  let playerNameIndex = scoreArr.findIndex(item => {
     return item.name == scoreItem.name;
   });
-
-  let playerScoreIndex = scoreArr.findIndex(item => {
+  let playerScorePosIndex = scoreArr.findIndex(item => {
     return scoreItem.score >= item.score;
   });
+  let currentUser = scoreArr[playerNameIndex];
+  let isTopScore = playerScorePosIndex != -1;
 
-  playerScoreIndex =
-    playerScoreIndex == -1 ? scoreArr.length - 1 : playerScoreIndex;
-
-  if (playerIndex != -1) {
-    scoreArr.splice(playerIndex, 1, scoreItem);
+  if (currentUser && isTopScore) {
+    if (currentUser.score >= scoreItem.score) return scoreArr;
+    scoreArr.splice(playerNameIndex, 1);
+    scoreArr.splice(playerScorePosIndex, 0, scoreItem);
     return scoreArr;
   }
 
-  scoreArr.splice(playerScoreIndex, 0, scoreItem);
+  if (isTopScore) {
+    scoreArr.splice(playerScorePosIndex, 0, scoreItem);
+    scoreArr.splice(TOP_SCORE_LENGTH, 1);
+    return scoreArr;
+  }
+
+  scoreArr.push(scoreItem);
+  scoreArr.splice(TOP_SCORE_LENGTH);
   return scoreArr;
 }
 
@@ -57,7 +68,7 @@ scoreRouter.post("/", function(req, res) {
 });
 
 function saveHiScores() {
-  writeJSONArray(hiScoresFilePath, hiScores);
+  writeJSONArray(hiScoresFilePath, hiScores, true);
 
   console.log(`💾  hiScores saved to ${hiScoresFilePath}`);
 }
