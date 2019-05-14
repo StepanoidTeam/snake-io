@@ -1,28 +1,23 @@
 const express = require("express");
+const { writeJSONArray, readJSONArray } = require("./helpers/file");
 
 const scoreRouter = express.Router();
 
-const { writeJSONArray, readJSONArray, clearFile } = require("./helpers/file");
-
+//todo: move to config?
 const hiScoresFilePath = "./scores.json";
-
-//to keep only top 10 results for hi-scores
-//sort by score
-//keep only 1 user with unique name
-
 const TOP_SCORE_LENGTH = 10;
 
 function updateScore(scoreArr, scoreItem = {}) {
   if (!scoreArr) return [scoreItem];
 
-  let playerNameIndex = scoreArr.findIndex(item => {
+  const playerNameIndex = scoreArr.findIndex(item => {
     return item.name == scoreItem.name;
   });
-  let playerScorePosIndex = scoreArr.findIndex(item => {
+  const playerScorePosIndex = scoreArr.findIndex(item => {
     return scoreItem.score >= item.score;
   });
-  let currentUser = scoreArr[playerNameIndex];
-  let isTopScore = playerScorePosIndex != -1;
+  const currentUser = scoreArr[playerNameIndex];
+  const isTopScore = playerScorePosIndex != -1;
 
   if (currentUser && isTopScore) {
     if (currentUser.score >= scoreItem.score) return scoreArr;
@@ -42,18 +37,12 @@ function updateScore(scoreArr, scoreItem = {}) {
   return scoreArr;
 }
 
-var hiScores = readJSONArray(hiScoresFilePath);
+let hiScores = readJSONArray(hiScoresFilePath);
 
-// middleware that is specific to this router
-// router.use(function timeLog(req, res, next) {
-//   console.log('Time: ', Date.now());
-//   next();
-// });
-// define the home page route
 scoreRouter.get("/", function(req, res) {
   res.json(hiScores);
 });
-// define the about route
+
 scoreRouter.post("/", function(req, res) {
   console.log(req.body);
   //todo: check validity of user
@@ -61,8 +50,6 @@ scoreRouter.post("/", function(req, res) {
   let user = req.body;
 
   hiScores = updateScore(hiScores, user);
-
-  //   broadcast(JSON.stringify(user));
 
   res.json(hiScores);
 });
