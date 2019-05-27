@@ -21,7 +21,7 @@ function reducer(event) {
       break;
     }
     default: {
-      console.log("⚠️", event);
+      console.log("🌐", event);
     }
   }
 

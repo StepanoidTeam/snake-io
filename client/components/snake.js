@@ -3,12 +3,12 @@ import { Container } from "./container.js";
 import { SNAKE_TYPES, getRandomKey } from "../images/index.js";
 
 export class Snake extends Container {
+  //todo: let the player choose the type?
   constructor({ x, y, snakeType = getRandomKey(SNAKE_TYPES) }) {
     super();
     this.snakeType = snakeType.name;
     this.snakeParts = [new Point({ x, y })];
     this.sprites = {
-      //todo: make body/joint recoloring here?
       snakeHead: new Sprite({ x, y, image: snakeType.HEAD }),
       snakeBody: new Sprite({ x, y, image: snakeType.BODY }),
       snakeJoint: new Sprite({ x, y, image: snakeType.JOINT })
