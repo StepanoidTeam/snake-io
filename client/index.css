@@ -63,10 +63,16 @@ canvas {
   top: 0;
   right: 0;
   padding: 10px;
+  font-size: 1.5em;
+  text-align: right;
 }
 
 .game-over {
-  font-size: 4em;
+  font-size: 3em;
+}
+
+.high-scores {
+  font-size: 1.5em;
 }
 
 .btn-start-game {
